@@ -24,7 +24,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-EndpointsRepository Route = new (app.Configuration);
+EndpointsService Route = new (app.Configuration);
 Route.Endpoints(app);
 
 app.UseHttpsRedirection();

@@ -12,6 +12,8 @@ namespace MinhaPrimeiraAPI.Data
 
         public DbSet<ExercicioModel> Exercicios { get; set; }
 
+        public DbSet<UserModel> Users { get; set; }
+
         public DbSet<RoutinesModel> Routines { get; set; }
     }
 }

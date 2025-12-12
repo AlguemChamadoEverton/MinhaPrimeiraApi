@@ -1,25 +1,25 @@
-﻿using MinhaPrimeiraAPI.Data;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MinhaPrimeiraAPI.Models;
-using System.Runtime.CompilerServices;
-using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using MinhaPrimeiraAPI.Entities;
 using Microsoft.Identity.Client;
-using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using MinhaPrimeiraAPI.Data;
+using MinhaPrimeiraAPI.Models;
+using MinhaPrimeiraAPI.Services;
+using System.ComponentModel.DataAnnotations;
+using System.Configuration;
+using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
+using System.Text;
 
 namespace MinhaPrimeiraAPI.Endpoints
 {
-    public class EndpointsRepository(IConfiguration configuration)
+    public class EndpointsService(IConfiguration configuration)
     {
         public static AppDbContext db = new AppDbContext();
-
-        public static User user = new();
+        public AuthService auth = new AuthService(configuration);
         public void Endpoints(WebApplication app) 
         {
             app.MapGet("/", () =>
@@ -28,31 +28,11 @@ namespace MinhaPrimeiraAPI.Endpoints
             });
             app.MapPost("/", (UserModel request) =>
             {
-                var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
-
-                user.Email = request.Email;
-                user.PasswordHash = hashedPassword;
-
-                return Results.Ok(user);
+                return auth.RegisterAsync(request);
             });
             app.MapPost("/login", (UserModel request) =>
             {
-                if (user.Email != request.Email) 
-                {
-                    return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
-                    {
-                        { "Error: ", $"The requested email '{request.Email}' do not exists"}
-                    });
-                }
-                if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed) 
-                {
-                    return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
-                    {
-                        { "Error: ", $"The password is wrong."}
-                    });
-                }
-                string token = CreateToken(user);
-                return Results.Ok(token);
+                return auth.LoginAsync(request);
             });
             app.MapGet("/exercice", () => 
             {
@@ -121,29 +101,8 @@ namespace MinhaPrimeiraAPI.Endpoints
             });
             app.MapGet("/routines", () => //para continuar precisarei de authenticação do usuário para que possa indicar de onde virá o treino, preciso criar uma tela de login e criar usuário e dar um jeito de usar uma key ou algo do gênero
             {
-                return db.Routines
+                return db.Routines;
             }).RequireAuthorization();
-        }
-        private string CreateToken(User user) 
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:token")!));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-
-            var tokenDescriptor = new JwtSecurityToken(
-                issuer: configuration.GetValue<string>("AppSetting:Issuer"),
-                audience: configuration.GetValue<string>("AppSetting:Audience"),
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(1),
-                signingCredentials: creds
-            );
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
     }
 }
