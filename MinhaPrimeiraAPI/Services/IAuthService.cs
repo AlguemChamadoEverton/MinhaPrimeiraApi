@@ -7,6 +7,6 @@ namespace MinhaPrimeiraAPI.Services
     {
         Task<IResult> RegisterAsync(UserModel request);
         Task<IResult> LoginAsync(UserModel request);
-       
+
     }
 }

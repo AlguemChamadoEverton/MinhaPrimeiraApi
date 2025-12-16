@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using MinhaPrimeiraAPI.Data;
 using MinhaPrimeiraAPI.Models;
 using System.Configuration;
@@ -24,7 +25,7 @@ namespace MinhaPrimeiraAPI.Services
         {
             var hashedPassword = new PasswordHasher<UserModel>().HashPassword(request, request.PasswordHash);
 
-            await db.AddAsync<UserModel>(new UserModel
+            await db.Users.AddAsync(new UserModel
             {
                 Email = request.Email,
                 PasswordHash = hashedPassword
@@ -35,7 +36,7 @@ namespace MinhaPrimeiraAPI.Services
         }
         public async Task<IResult> LoginAsync(UserModel request)
         {
-            var user = await db.Users.Where
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
             {
                 return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
