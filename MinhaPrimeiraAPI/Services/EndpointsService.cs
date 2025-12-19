@@ -42,11 +42,11 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return ExerciseService.GetExerciseById(id);
             });
-            app.MapPost("/exercice", (ExercicioModel model) =>
+            app.MapPost("/exercice", (ExerciseModel model) =>
             {
                 return ExerciseService.CreateExercise(model);
             });
-            app.MapPut("/exercice", (ExercicioModel model) =>
+            app.MapPut("/exercice", (ExerciseModel model) =>
             {
                 return ExerciseService.UpdateExercise(model);
             });

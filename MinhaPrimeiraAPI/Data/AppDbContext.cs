@@ -10,10 +10,10 @@ namespace MinhaPrimeiraAPI.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer("Server=localhost;Database=GymTrackerDb;Trusted_Connection=True;TrustServerCertificate=True;");
 
-        public DbSet<ExercicioModel> Exercicios { get; set; }
-
+        public DbSet<ExerciseModel> Exercises { get; set; }
         public DbSet<UserModel> Users { get; set; }
-
-        public DbSet<RoutinesModel> Routines { get; set; }
+        public DbSet<RoutineModel> Routines { get; set; }
+        public DbSet<MuscleModel> Muscles { get; set; }
+        public DbSet<ExerciseMuscle> ExerciseMuscles { get; set; }
     }
 }
