@@ -10,7 +10,7 @@ namespace MinhaPrimeiraAPI.Models
         [Required]
         public string TargetMuscle { get; set; } = string.Empty;
         public ICollection<RoutineModel> Routines { get; set; } = new List<RoutineModel>();
-        public List<ExerciseMuscle> ExerciseMuscles { get; } = [];
+        public List<ExerciseMuscleModel> ExerciseMuscles { get; } = [];
         public List<MuscleModel> Muscles { get; } = [];
     }
 }

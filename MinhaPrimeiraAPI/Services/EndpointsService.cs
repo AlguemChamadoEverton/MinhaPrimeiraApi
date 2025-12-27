@@ -54,9 +54,16 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return ExerciseService.DeleteExerciseById(id);
             });
-            app.MapGet("/routines", () => //para continuar precisarei de authenticação do usuário para que possa indicar de onde virá o treino, preciso criar uma tela de login e criar usuário e dar um jeito de usar uma key ou algo do gênero
+            app.MapGet("/routines", (ClaimsPrincipal jwt) =>
             {
-                return db.Routines;
+                var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+                
+            }).RequireAuthorization();
+            app.MapPost("/routines", (ClaimsPrincipal jwt) =>
+            {
+                var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+
+
             }).RequireAuthorization();
         }
     }

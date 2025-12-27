@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
+using MinhaPrimeiraAPI.Endpoints;
 
 namespace MinhaPrimeiraAPI.Services
 {
@@ -20,23 +21,26 @@ namespace MinhaPrimeiraAPI.Services
         {
             _configuration = configuration;
         }
-        public static AppDbContext db = new AppDbContext();
         public async Task<IResult> RegisterAsync(UserModel request)
         {
-            var hashedPassword = new PasswordHasher<UserModel>().HashPassword(request, request.PasswordHash);
-
-            await db.Users.AddAsync(new UserModel
+            var user = await EndpointsService.db.Users.FirstOrDefaultAsync(b => b.Email == request.Email);
+            if(user == null)
             {
-                Email = request.Email,
-                PasswordHash = hashedPassword
-            });
-            await db.SaveChangesAsync();
+                request.PasswordHash = new PasswordHasher<UserModel>().HashPassword(request, request.PasswordHash);
+                await EndpointsService.db.Users.AddAsync(request);
+                await EndpointsService.db.SaveChangesAsync();
 
-            return Results.Ok();
+                return Results.Created();
+            }
+
+            return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
+                {
+                    { "Error: ", $"The requested email '{request.Email}' already exists"}
+                });
         }
         public async Task<IResult> LoginAsync(UserModel request)
         {
-            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var user = await EndpointsService.db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
             {
                 return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
@@ -67,8 +71,8 @@ namespace MinhaPrimeiraAPI.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             var tokenDescriptor = new JwtSecurityToken(
-                issuer: _configuration.GetValue<string>("AppSetting:Issuer"),
-                audience: _configuration.GetValue<string>("AppSetting:Audience"),
+                issuer: _configuration.GetValue<string>("AppSettings:Issuer"),
+                audience: _configuration.GetValue<string>("AppSettings:Audience"),
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: creds
