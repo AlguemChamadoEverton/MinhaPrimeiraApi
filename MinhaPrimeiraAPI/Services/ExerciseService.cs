@@ -54,7 +54,7 @@ namespace MinhaPrimeiraAPI.Services
             if (exercice is not null)
             {
                 exercice.Name = ex.Name;
-                exercice.TargetMuscle = ex.TargetMuscle;
+                exercice.Muscles = ex.Muscles;
                 EndpointsService.db.Exercises.Update(exercice);
                 EndpointsService.db.SaveChanges();
                 return TypedResults.Created($"/exercice/{ex.Id}", ex);

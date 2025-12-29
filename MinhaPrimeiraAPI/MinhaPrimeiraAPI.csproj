@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\ExerciseService - Cópia.cs" />
     <Compile Remove="Services\GetExerciseInterface.cs" />
   </ItemGroup>
 

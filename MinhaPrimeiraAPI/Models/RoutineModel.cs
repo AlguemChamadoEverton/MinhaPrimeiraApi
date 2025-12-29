@@ -9,6 +9,7 @@ namespace MinhaPrimeiraAPI.Models
         public string Name { get; set; } = string.Empty;
         public int UserId { get; set; }
         public UserModel User { get; set; } = null!;
-        public ICollection<ExerciseModel> Exercises { get; set; } = new List<ExerciseModel>();
+        [Required]
+        public ICollection<ExerciseMuscleModel> ExerciseMuscles { get; set; } = new List<ExerciseMuscleModel>();
     }
 }

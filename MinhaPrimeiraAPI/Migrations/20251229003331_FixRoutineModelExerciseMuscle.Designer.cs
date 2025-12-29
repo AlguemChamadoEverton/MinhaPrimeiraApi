@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MinhaPrimeiraAPI.Data;
 
@@ -10,9 +11,11 @@ using MinhaPrimeiraAPI.Data;
 namespace MinhaPrimeiraAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251229003331_FixRoutineModelExerciseMuscle")]
+    partial class FixRoutineModelExerciseMuscle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,21 +37,6 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.HasIndex("MusclesId");
 
                     b.ToTable("ExerciseModelMuscleModel");
-                });
-
-            modelBuilder.Entity("ExerciseMuscleModelRoutineModel", b =>
-                {
-                    b.Property<int>("ExerciseMusclesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoutinesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ExerciseMusclesId", "RoutinesId");
-
-                    b.HasIndex("RoutinesId");
-
-                    b.ToTable("ExerciseMuscleModelRoutineModel");
                 });
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
@@ -82,6 +70,9 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.Property<int>("MuscleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RoutineModelId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Type")
                         .HasColumnType("bit");
 
@@ -90,6 +81,8 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.HasIndex("ExerciseId");
 
                     b.HasIndex("MuscleId");
+
+                    b.HasIndex("RoutineModelId");
 
                     b.ToTable("ExerciseMuscles");
                 });
@@ -174,21 +167,6 @@ namespace MinhaPrimeiraAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ExerciseMuscleModelRoutineModel", b =>
-                {
-                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", null)
-                        .WithMany()
-                        .HasForeignKey("ExerciseMusclesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MinhaPrimeiraAPI.Models.RoutineModel", null)
-                        .WithMany()
-                        .HasForeignKey("RoutinesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", b =>
                 {
                     b.HasOne("MinhaPrimeiraAPI.Models.ExerciseModel", "Exercise")
@@ -202,6 +180,10 @@ namespace MinhaPrimeiraAPI.Migrations
                         .HasForeignKey("MuscleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MinhaPrimeiraAPI.Models.RoutineModel", null)
+                        .WithMany("ExerciseMuscles")
+                        .HasForeignKey("RoutineModelId");
 
                     b.Navigation("Exercise");
 
@@ -231,6 +213,11 @@ namespace MinhaPrimeiraAPI.Migrations
                 });
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.MuscleModel", b =>
+                {
+                    b.Navigation("ExerciseMuscles");
+                });
+
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.RoutineModel", b =>
                 {
                     b.Navigation("ExerciseMuscles");
                 });

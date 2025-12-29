@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MinhaPrimeiraAPI.Data;
 
@@ -10,9 +11,11 @@ using MinhaPrimeiraAPI.Data;
 namespace MinhaPrimeiraAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251229000008_FixExerciseModel")]
+    partial class FixExerciseModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,19 +39,19 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.ToTable("ExerciseModelMuscleModel");
                 });
 
-            modelBuilder.Entity("ExerciseMuscleModelRoutineModel", b =>
+            modelBuilder.Entity("ExerciseModelRoutineModel", b =>
                 {
-                    b.Property<int>("ExerciseMusclesId")
+                    b.Property<int>("ExercisesId")
                         .HasColumnType("int");
 
                     b.Property<int>("RoutinesId")
                         .HasColumnType("int");
 
-                    b.HasKey("ExerciseMusclesId", "RoutinesId");
+                    b.HasKey("ExercisesId", "RoutinesId");
 
                     b.HasIndex("RoutinesId");
 
-                    b.ToTable("ExerciseMuscleModelRoutineModel");
+                    b.ToTable("ExerciseModelRoutineModel");
                 });
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
@@ -119,9 +122,6 @@ namespace MinhaPrimeiraAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ExerciseModelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -130,8 +130,6 @@ namespace MinhaPrimeiraAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ExerciseModelId");
 
                     b.HasIndex("UserId");
 
@@ -174,11 +172,11 @@ namespace MinhaPrimeiraAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ExerciseMuscleModelRoutineModel", b =>
+            modelBuilder.Entity("ExerciseModelRoutineModel", b =>
                 {
-                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", null)
+                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseModel", null)
                         .WithMany()
-                        .HasForeignKey("ExerciseMusclesId")
+                        .HasForeignKey("ExercisesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -210,10 +208,6 @@ namespace MinhaPrimeiraAPI.Migrations
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.RoutineModel", b =>
                 {
-                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseModel", null)
-                        .WithMany("Routines")
-                        .HasForeignKey("ExerciseModelId");
-
                     b.HasOne("MinhaPrimeiraAPI.Models.UserModel", "User")
                         .WithMany("Routines")
                         .HasForeignKey("UserId")
@@ -226,8 +220,6 @@ namespace MinhaPrimeiraAPI.Migrations
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
                 {
                     b.Navigation("ExerciseMuscles");
-
-                    b.Navigation("Routines");
                 });
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.MuscleModel", b =>

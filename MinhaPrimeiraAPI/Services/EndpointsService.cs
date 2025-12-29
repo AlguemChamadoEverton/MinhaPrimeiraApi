@@ -56,12 +56,12 @@ namespace MinhaPrimeiraAPI.Endpoints
             });
             app.MapGet("/routines", (ClaimsPrincipal jwt) =>
             {
-                var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+                return RoutineService.GetRoutine(jwt);
                 
             }).RequireAuthorization();
-            app.MapPost("/routines", (ClaimsPrincipal jwt) =>
+            app.MapPost("/routines", (ClaimsPrincipal jwt, RoutineModel routine) =>
             {
-                var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+                return RoutineService.CreateRoutine(jwt, routine);
 
 
             }).RequireAuthorization();
