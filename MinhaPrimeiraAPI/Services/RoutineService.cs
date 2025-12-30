@@ -21,7 +21,7 @@ namespace MinhaPrimeiraAPI.Services
         public static async Task<IResult> GetRoutine(ClaimsPrincipal jwt)
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-            var routines = EndpointsService.db.Routines.ToListAsync();
+            var routines = await EndpointsService.db.Routines.ToListAsync();
             return TypedResults.Ok(routines);
         }
     }

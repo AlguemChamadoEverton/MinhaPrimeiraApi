@@ -1,6 +1,7 @@
 ﻿using MinhaPrimeiraAPI.Endpoints;
 using MinhaPrimeiraAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using MinhaPrimeiraAPI.DTOs;
 
 namespace MinhaPrimeiraAPI.Services
 {
@@ -8,20 +9,41 @@ namespace MinhaPrimeiraAPI.Services
     {
         public static async Task<IResult> GetExercises()
         {
-            var teste = await EndpointsService.db.Exercises.ToListAsync();
-            return Results.Ok(teste);
+            var exercisesTask = await EndpointsService.db.Exercises.ToListAsync();
+            var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
+
+            var result = new ExerciseMuscleDTO
+            {
+                Exercises = exercisesTask,
+                Muscles = musclesTask
+            };
+
+            return Results.Ok(result);
         }
         public static async Task<IResult> GetExerciseById(int id) 
         {
-            var exercice = await EndpointsService.db.Exercises.FirstOrDefaultAsync(b => b.Id == id);
-            if (exercice is null)
+            var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Where(em => em.ExerciseId == id).ToListAsync();
+            if (exercisemuscle is null)
                 return Results.Problem(statusCode: 404, extensions:
                     new Dictionary<string, object?>
                     {
                         { "Error: ", $"The requested Id {id} was not found"}
                     }
                 );
-            return TypedResults.Ok(exercice);
+            var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
+            var muscles = await EndpointsService.db.Muscles
+            .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
+            var exercise = await EndpointsService.db.Exercises.FirstOrDefaultAsync(ex => ex.Id == id);
+            if (exercise is not null)
+            {
+                var result = new ExerciseByIdDTO()
+                {
+                    ExerciseName = exercise.Name,
+                    MuscleName = muscles.Select(e => e.Name).ToList()
+                };
+                return TypedResults.Ok(result);
+            }
+            return TypedResults.BadRequest(); //Tem que colocar o erro aqui condinzente
         }
         public static async Task<IResult> CreateExercise(ExerciseModel ex) 
         {
@@ -54,7 +76,7 @@ namespace MinhaPrimeiraAPI.Services
             if (exercice is not null)
             {
                 exercice.Name = ex.Name;
-                exercice.Muscles = ex.Muscles;
+                exercice.ExerciseMuscles = ex.ExerciseMuscles;
                 EndpointsService.db.Exercises.Update(exercice);
                 EndpointsService.db.SaveChanges();
                 return TypedResults.Created($"/exercice/{ex.Id}", ex);
