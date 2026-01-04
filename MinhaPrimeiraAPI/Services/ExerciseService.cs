@@ -20,30 +20,28 @@ namespace MinhaPrimeiraAPI.Services
 
             return Results.Ok(result);
         }
-        public static async Task<IResult> GetExerciseById(int id) 
+        public static async Task<IResult> GetExerciseById(int id)
         {
             var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Where(em => em.ExerciseId == id).ToListAsync();
-            if (exercisemuscle is null)
+            if (exercisemuscle.Count == 0)
+            {
                 return Results.Problem(statusCode: 404, extensions:
                     new Dictionary<string, object?>
                     {
                         { "Error: ", $"The requested Id {id} was not found"}
                     }
                 );
+            }
+            var exercise = await EndpointsService.db.Exercises.FirstOrDefaultAsync(ex => ex.Id == id);
             var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
             var muscles = await EndpointsService.db.Muscles
             .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
-            var exercise = await EndpointsService.db.Exercises.FirstOrDefaultAsync(ex => ex.Id == id);
-            if (exercise is not null)
+            var result = new ExerciseByIdDTO()
             {
-                var result = new ExerciseByIdDTO()
-                {
-                    ExerciseName = exercise.Name,
-                    MuscleName = muscles.Select(e => e.Name).ToList()
-                };
-                return TypedResults.Ok(result);
-            }
-            return TypedResults.BadRequest(); //Tem que colocar o erro aqui condinzente
+                ExerciseName = exercise.Name,
+                MuscleName = muscles.Select(e => e.Name).ToList()
+            };
+            return TypedResults.Ok(result);
         }
         public static async Task<IResult> CreateExercise(ExerciseModel ex) 
         {
@@ -58,7 +56,7 @@ namespace MinhaPrimeiraAPI.Services
                 {
                     { "Error: ", $"Please do not insert the id"}
                 });
-                }//tem um bug aqui que quando o usuário envia um id que já existe e passou nas outras aprovações ele trava tudo
+                }
                 return TypedResults.Created($"/exercice/{ex.Id}", ex);
             }
             return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
