@@ -34,23 +34,23 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return auth.LoginAsync(request);
             });
-            app.MapGet("/exercice", () => 
+            app.MapGet("/exercise", () => 
             {
                 return ExerciseService.GetExercises();
             });
-            app.MapGet("/exercice/{id}", (int id) =>
+            app.MapGet("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.GetExerciseById(id);
             });
-            app.MapPost("/exercice", (ExerciseModel model) =>
+            app.MapPost("/exercise", (ExerciseModel model) =>
             {
                 return ExerciseService.CreateExercise(model);
             });
-            app.MapPut("/exercice", (ExerciseModel model) =>
+            app.MapPut("/exercise", (ExerciseModel model) =>
             {
                 return ExerciseService.UpdateExercise(model);
             });
-            app.MapDelete("/exercice/{id}", (int id) =>
+            app.MapDelete("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.DeleteExerciseById(id);
             });

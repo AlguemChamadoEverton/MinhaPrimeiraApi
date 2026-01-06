@@ -12,10 +12,10 @@ namespace MinhaPrimeiraAPI.Services
             var exercisesTask = await EndpointsService.db.Exercises.ToListAsync();
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
 
-            var result = new ExerciseMuscleDTO
+            var result = new ExerciseDTO
             {
-                Exercises = exercisesTask,
-                Muscles = musclesTask
+                ExerciseName = exercisesTask.Select(ex => ex.Name).ToList(),
+                MuscleName = musclesTask.Select(ex => ex.Name).ToList()
             };
 
             return Results.Ok(result);
@@ -36,9 +36,9 @@ namespace MinhaPrimeiraAPI.Services
             var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
             var muscles = await EndpointsService.db.Muscles
             .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
-            var result = new ExerciseByIdDTO()
+            var result = new ExerciseDTO()
             {
-                ExerciseName = exercise.Name,
+                ExerciseName = [exercise.Name],
                 MuscleName = muscles.Select(e => e.Name).ToList()
             };
             return TypedResults.Ok(result);
