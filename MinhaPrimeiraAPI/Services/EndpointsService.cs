@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using MinhaPrimeiraAPI.Data;
+using MinhaPrimeiraAPI.DTOs;
 using MinhaPrimeiraAPI.Models;
 using MinhaPrimeiraAPI.Services;
 using System.ComponentModel.DataAnnotations;
@@ -42,7 +43,7 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return ExerciseService.GetExerciseById(id);
             });
-            app.MapPost("/exercise", (ExerciseModel model) =>
+            app.MapPost("/exercise", (ExerciseDTO model) =>
             {
                 return ExerciseService.CreateExercise(model);
             });

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Azure;
+using System.ComponentModel.DataAnnotations;
 
 namespace MinhaPrimeiraAPI.Models
 {
@@ -7,6 +8,8 @@ namespace MinhaPrimeiraAPI.Models
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
-        public ICollection<ExerciseMuscleModel> ExerciseMuscles { get; set; } = [];
+        [Required]
+        public List<MuscleModel> Muscles { get; set; } = [];
+        public List<ExerciseMuscleModel> ExerciseMuscles { get; set; } = [];
     }
 }

@@ -1,7 +1,7 @@
-﻿using MinhaPrimeiraAPI.Endpoints;
-using MinhaPrimeiraAPI.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MinhaPrimeiraAPI.DTOs;
+using MinhaPrimeiraAPI.Endpoints;
+using MinhaPrimeiraAPI.Models;
 
 namespace MinhaPrimeiraAPI.Services
 {
@@ -43,25 +43,32 @@ namespace MinhaPrimeiraAPI.Services
             };
             return TypedResults.Ok(result);
         }
-        public static async Task<IResult> CreateExercise(ExerciseModel ex) 
+        public static async Task<IResult> CreateExercise(ExerciseDTO ex) 
         {
-            var exercice = await EndpointsService.db.Exercises.FirstOrDefaultAsync(b => b.Name == ex.Name);
-            if (exercice is null)
+            string exercise = ex.ExerciseName.First();
+            if (!await EndpointsService.db.Exercises.AnyAsync(b => b.Name.ToLower() == exercise.ToLower()))
             {
-                await EndpointsService.db.Exercises.AddAsync(ex);
-                try { EndpointsService.db.SaveChanges(); }
-                catch(Exception)
+                var muscleobject = await EndpointsService.db.Muscles.Where(
+                    m => ex.MuscleName.Contains(m.Name)).ToListAsync();
+                if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
                 {
-                    return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
-                {
-                    { "Error: ", $"Please do not insert the id"}
-                });
+                    ExerciseModel result = new()
+                    {
+                        Name = exercise,
+                        Muscles = muscleobject
+                    };
+                    await EndpointsService.db.Exercises.AddAsync(result);
+                    await EndpointsService.db.SaveChangesAsync();
+                    return TypedResults.Created($"/exercise/{result.Id}", ex);
                 }
-                return TypedResults.Created($"/exercice/{ex.Id}", ex);
+                return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
+                {
+                    { "Error: ", $"All muscles needs to be valid!"}
+                });
             }
             return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
                 {
-                    { "Error: ", $"The requested name '{ex.Name}' is already registered"}
+                    { "Error: ", $"The requested name '{exercise}' is already registered"}
                 });
         }
         public static async Task<IResult> UpdateExercise(ExerciseModel ex)

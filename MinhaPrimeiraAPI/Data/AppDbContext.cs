@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MinhaPrimeiraAPI.Models;
 using System;
@@ -15,5 +16,14 @@ namespace MinhaPrimeiraAPI.Data
         public DbSet<RoutineModel> Routines { get; set; }
         public DbSet<MuscleModel> Muscles { get; set; }
         public DbSet<ExerciseMuscleModel> ExerciseMuscles { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ExerciseModel>()
+                .HasMany(e => e.Muscles)
+                .WithMany(e => e.Exercises)
+                .UsingEntity<ExerciseMuscleModel>(
+                    r => r.HasOne<MuscleModel>(e => e.Muscle).WithMany(e => e.ExerciseMuscles),
+                    l => l.HasOne<ExerciseModel>(e => e.Exercise).WithMany(e => e.ExerciseMuscles));
+        }
     }
 }
