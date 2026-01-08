@@ -7,7 +7,7 @@ namespace MinhaPrimeiraAPI.Models
         public int Id { get; set; }
         public int ExerciseId { get; set; }
         public int MuscleId { get; set; }
-        public bool Type { get; set; }
+        public bool Type { get; set; } = false;
         public ICollection<RoutineModel> Routines { get; set; } = new List<RoutineModel>();
         public ExerciseModel Exercise { get; set; } = null!;
         public MuscleModel Muscle { get; set; } = null!;

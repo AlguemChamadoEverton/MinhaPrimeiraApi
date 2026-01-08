@@ -48,8 +48,9 @@ namespace MinhaPrimeiraAPI.Services
             string exercise = ex.ExerciseName.First();
             if (!await EndpointsService.db.Exercises.AnyAsync(b => b.Name.ToLower() == exercise.ToLower()))
             {
-                var muscleobject = await EndpointsService.db.Muscles.Where(
-                    m => ex.MuscleName.Contains(m.Name)).ToListAsync();
+                ex.MuscleName.Add(ex.MainMuscle);
+                var muscleobject = (await EndpointsService.db.Muscles.Where(
+                    m => ex.MuscleName.Contains(m.Name)).ToListAsync());
                 if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
                 {
                     ExerciseModel result = new()
@@ -58,6 +59,9 @@ namespace MinhaPrimeiraAPI.Services
                         Muscles = muscleobject
                     };
                     await EndpointsService.db.Exercises.AddAsync(result);
+                    var main = muscleobject.First(a => a.Name == ex.MainMuscle);
+                    EndpointsService.db.ExerciseMuscles.First(
+                        b => (b.ExerciseId == result.Id) && (b.MuscleId == main.Id)).Type = true;
                     await EndpointsService.db.SaveChangesAsync();
                     return TypedResults.Created($"/exercise/{result.Id}", ex);
                 }
