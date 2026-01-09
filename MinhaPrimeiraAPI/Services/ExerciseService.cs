@@ -38,12 +38,14 @@ namespace MinhaPrimeiraAPI.Services
             }
             var exercise = await EndpointsService.db.Exercises.FirstOrDefaultAsync(ex => ex.Id == id);
             var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
+            var mainmuscle = exercisemuscle.First(a => a.ExerciseId == id && a.Type == true);
             var muscles = await EndpointsService.db.Muscles
             .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
             var result = new ExerciseDTO()
             {
                 ExerciseName = [exercise.Name],
-                MuscleName = muscles.Select(e => e.Name).ToList()
+                MuscleName = muscles.Select(e => e.Name).ToList(),
+                MainMuscle = [muscles.First(b => b.Id == mainmuscle.MuscleId).Name]
             };
             return TypedResults.Ok(result);
         }
