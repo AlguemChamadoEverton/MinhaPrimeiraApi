@@ -10,8 +10,6 @@ namespace MinhaPrimeiraAPI.Services
 
         public static abstract Task<IResult> CreateExercise(ExerciseDTO ex);
 
-        public static abstract Task<IResult> UpdateExercise(ExerciseModel ex);
-
         public static abstract Task<IResult> DeleteExerciseById(int id);
        
 

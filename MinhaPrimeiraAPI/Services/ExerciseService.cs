@@ -82,26 +82,6 @@ namespace MinhaPrimeiraAPI.Services
                     { "Error: ", $"The requested name '{exercise}' is already registered"}
                 });
         }
-        public static async Task<IResult> UpdateExercise(ExerciseModel ex)
-        {
-            if (ex.Id == 0) return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
-                {
-                    { "Error: ", $"Please, specify the id"}
-                });
-            var exercice = await EndpointsService.db.Exercises.FirstOrDefaultAsync(b => b.Id == ex.Id);
-            if (exercice is not null)
-            {
-                exercice.Name = ex.Name;
-                exercice.ExerciseMuscles = ex.ExerciseMuscles;
-                EndpointsService.db.Exercises.Update(exercice);
-                EndpointsService.db.SaveChanges();
-                return TypedResults.Created($"/exercice/{ex.Id}", ex);
-            }
-            return Results.Problem(statusCode: 404, extensions: new Dictionary<string, object?>
-                {
-                    { "Error: ", $"The requested id '{ex.Id}' was not found"}
-                });
-        }
         public static async Task<IResult> DeleteExerciseById(int id)
         {
             var result = await EndpointsService.db.Exercises.FirstOrDefaultAsync(exercice => exercice.Id == id);
@@ -116,6 +96,5 @@ namespace MinhaPrimeiraAPI.Services
                     {"Error: ", $"The requested Id {id} was not found"}
                 });
         }
-
     }
 }

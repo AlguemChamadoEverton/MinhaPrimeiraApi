@@ -48,10 +48,6 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return ExerciseService.CreateExercise(model);
             }).WithParameterValidation();
-            app.MapPut("/exercise", (ExerciseModel model) =>
-            {
-                return ExerciseService.UpdateExercise(model);
-            }).WithParameterValidation();
             app.MapDelete("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.DeleteExerciseById(id);
