@@ -11,11 +11,15 @@ namespace MinhaPrimeiraAPI.Services
         {
             var exercisesTask = await EndpointsService.db.Exercises.ToListAsync();
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
+            var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.ToListAsync();
+            
+            var exIds = exercisesTask.Select(x => x.Id).ToList();
 
             var result = new ExerciseDTO
             {
                 ExerciseName = exercisesTask.Select(ex => ex.Name).ToList(),
-                MuscleName = musclesTask.Select(ex => ex.Name).ToList()
+                MuscleName = musclesTask.Select(m => m.Name).ToList(),
+                MainMuscle = exercisemusclesTask.Where(exm => exIds.Contains(exm.ExerciseId)).Select(x => x.Muscle.Name).ToList()
             };
 
             return Results.Ok(result);
@@ -48,7 +52,7 @@ namespace MinhaPrimeiraAPI.Services
             string exercise = ex.ExerciseName.First();
             if (!await EndpointsService.db.Exercises.AnyAsync(b => b.Name.ToLower() == exercise.ToLower()))
             {
-                ex.MuscleName.Add(ex.MainMuscle);
+                ex.MuscleName.Add(ex.MainMuscle.First());
                 var muscleobject = (await EndpointsService.db.Muscles.Where(
                     m => ex.MuscleName.Contains(m.Name)).ToListAsync());
                 if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
@@ -59,7 +63,8 @@ namespace MinhaPrimeiraAPI.Services
                         Muscles = muscleobject
                     };
                     await EndpointsService.db.Exercises.AddAsync(result);
-                    var main = muscleobject.First(a => a.Name == ex.MainMuscle);
+                    var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());
+                    await EndpointsService.db.SaveChangesAsync();
                     EndpointsService.db.ExerciseMuscles.First(
                         b => (b.ExerciseId == result.Id) && (b.MuscleId == main.Id)).Type = true;
                     await EndpointsService.db.SaveChangesAsync();

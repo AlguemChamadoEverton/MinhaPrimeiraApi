@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
+using MinimalApis.Extensions;
 
 namespace MinhaPrimeiraAPI.Endpoints
 {
@@ -30,42 +31,42 @@ namespace MinhaPrimeiraAPI.Endpoints
             app.MapPost("/", (UserModel request) =>
             {
                 return auth.RegisterAsync(request);
-            });
+            }).WithParameterValidation();
             app.MapPost("/login", (UserModel request) =>
             {
                 return auth.LoginAsync(request);
-            });
+            }).WithParameterValidation();
             app.MapGet("/exercise", () => 
             {
                 return ExerciseService.GetExercises();
-            });
+            }).WithParameterValidation();
             app.MapGet("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.GetExerciseById(id);
-            });
+            }).WithParameterValidation();
             app.MapPost("/exercise", (ExerciseDTO model) =>
             {
                 return ExerciseService.CreateExercise(model);
-            });
+            }).WithParameterValidation();
             app.MapPut("/exercise", (ExerciseModel model) =>
             {
                 return ExerciseService.UpdateExercise(model);
-            });
+            }).WithParameterValidation();
             app.MapDelete("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.DeleteExerciseById(id);
-            });
+            }).WithParameterValidation();
             app.MapGet("/routines", (ClaimsPrincipal jwt) =>
             {
                 return RoutineService.GetRoutine(jwt);
                 
-            }).RequireAuthorization();
+            }).RequireAuthorization().WithParameterValidation();
             app.MapPost("/routines", (ClaimsPrincipal jwt, RoutineModel routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
 
 
-            }).RequireAuthorization();
+            }).RequireAuthorization().WithParameterValidation();
         }
     }
 }

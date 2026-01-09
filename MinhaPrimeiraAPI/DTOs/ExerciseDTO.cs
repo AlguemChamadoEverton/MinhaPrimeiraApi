@@ -1,5 +1,6 @@
 ﻿using MinhaPrimeiraAPI.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MinhaPrimeiraAPI.DTOs
 {
@@ -8,6 +9,7 @@ namespace MinhaPrimeiraAPI.DTOs
         public List<string> ExerciseName { get; set; } = new List<string>();
         public List<string> MuscleName { get; set; } = new List<string>();
         [Required]
-        public string MainMuscle { get; set; } = "";
+        [MinLength(1)]
+        public List<string> MainMuscle { get; set; } = [];
     }
 }
