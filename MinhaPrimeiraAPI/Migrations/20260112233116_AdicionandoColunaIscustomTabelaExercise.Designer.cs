@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MinhaPrimeiraAPI.Data;
 
@@ -10,9 +11,11 @@ using MinhaPrimeiraAPI.Data;
 namespace MinhaPrimeiraAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260112233116_AdicionandoColunaIscustomTabelaExercise")]
+    partial class AdicionandoColunaIscustomTabelaExercise
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,12 +54,7 @@ namespace MinhaPrimeiraAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Exercises");
                 });
@@ -142,10 +140,6 @@ namespace MinhaPrimeiraAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -164,17 +158,6 @@ namespace MinhaPrimeiraAPI.Migrations
                         .HasForeignKey("RoutinesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
-                {
-                    b.HasOne("MinhaPrimeiraAPI.Models.UserModel", "User")
-                        .WithMany("Exercises")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", b =>
@@ -219,8 +202,6 @@ namespace MinhaPrimeiraAPI.Migrations
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.UserModel", b =>
                 {
-                    b.Navigation("Exercises");
-
                     b.Navigation("Routines");
                 });
 #pragma warning restore 612, 618

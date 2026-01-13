@@ -2,6 +2,7 @@
 using MinhaPrimeiraAPI.DTOs;
 using MinhaPrimeiraAPI.Endpoints;
 using MinhaPrimeiraAPI.Models;
+using System.Security.Claims;
 
 namespace MinhaPrimeiraAPI.Services
 {
@@ -49,7 +50,7 @@ namespace MinhaPrimeiraAPI.Services
             };
             return TypedResults.Ok(result);
         }
-        public static async Task<IResult> CreateExercise(ExerciseDTO ex) 
+        public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt) 
         {
             string exercise = ex.ExerciseName.First();
             if (!await EndpointsService.db.Exercises.AnyAsync(b => b.Name.ToLower() == exercise.ToLower()))
@@ -59,10 +60,12 @@ namespace MinhaPrimeiraAPI.Services
                     m => ex.MuscleName.Contains(m.Name)).ToListAsync());
                 if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
                 {
+                    var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
                     ExerciseModel result = new()
                     {
                         Name = exercise,
-                        Muscles = muscleobject
+                        Muscles = muscleobject,
+                        User = await EndpointsService.db.Users.FirstAsync(x => x.Email == email)
                     };
                     await EndpointsService.db.Exercises.AddAsync(result);
                     var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());

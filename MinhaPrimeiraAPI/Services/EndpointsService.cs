@@ -44,10 +44,10 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return ExerciseService.GetExerciseById(id);
             }).WithParameterValidation();
-            app.MapPost("/exercise", (ExerciseDTO model) =>
+            app.MapPost("/exercise", (ExerciseDTO model, ClaimsPrincipal jwt) =>
             {
-                return ExerciseService.CreateExercise(model);
-            }).WithParameterValidation();
+                return ExerciseService.CreateExercise(model, jwt);
+            }).RequireAuthorization().WithParameterValidation();
             app.MapDelete("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.DeleteExerciseById(id);

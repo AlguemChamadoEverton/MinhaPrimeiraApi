@@ -23,7 +23,7 @@ namespace MinhaPrimeiraAPI.Services
         }
         public async Task<IResult> RegisterAsync(UserModel request)
         {
-            var user = await EndpointsService.db.Users.FirstOrDefaultAsync(b => b.Email == request.Email);
+            var user = await EndpointsService.db.Users.FirstOrDefaultAsync(b => b.Email == request.Email || b.Username == request.Username);
             if(user == null)
             {
                 request.PasswordHash = new PasswordHasher<UserModel>().HashPassword(request, request.PasswordHash);
@@ -32,10 +32,15 @@ namespace MinhaPrimeiraAPI.Services
 
                 return Results.Created();
             }
-
-            return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
+            else if (user.Email == request.Email)
+                return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
                 {
                     { "Error: ", $"The requested email '{request.Email}' already exists"}
+                });
+            else
+                return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
+                {
+                    { "Error: ", $"The requested username '{request.Username}' already exists"}
                 });
         }
         public async Task<IResult> LoginAsync(UserModel request)
