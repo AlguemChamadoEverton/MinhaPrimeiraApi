@@ -2,12 +2,11 @@
 
 namespace MinhaPrimeiraAPI.Models
 {
-    public class MuscleModel
+    public class Muscle
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
-        public List<ExerciseModel> Exercises { get; set; } = [];
-        public ICollection<ExerciseMuscleModel> ExerciseMuscles { get; set; } = [];
+        public ICollection<ExerciseMuscle> ExerciseMuscles { get; set; } = [];
     }
 }

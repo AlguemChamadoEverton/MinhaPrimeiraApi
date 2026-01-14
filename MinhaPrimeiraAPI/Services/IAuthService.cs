@@ -5,8 +5,8 @@ namespace MinhaPrimeiraAPI.Services
 {
     public interface IAuthService
     {
-        Task<IResult> RegisterAsync(UserModel request);
-        Task<IResult> LoginAsync(UserModel request);
+        Task<IResult> RegisterAsync(User request);
+        Task<IResult> LoginAsync(User request);
 
     }
 }

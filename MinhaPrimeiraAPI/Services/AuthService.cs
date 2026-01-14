@@ -21,12 +21,12 @@ namespace MinhaPrimeiraAPI.Services
         {
             _configuration = configuration;
         }
-        public async Task<IResult> RegisterAsync(UserModel request)
+        public async Task<IResult> RegisterAsync(User request)
         {
             var user = await EndpointsService.db.Users.FirstOrDefaultAsync(b => b.Email == request.Email || b.Username == request.Username);
             if(user == null)
             {
-                request.PasswordHash = new PasswordHasher<UserModel>().HashPassword(request, request.PasswordHash);
+                request.PasswordHash = new PasswordHasher<User>().HashPassword(request, request.PasswordHash);
                 await EndpointsService.db.Users.AddAsync(request);
                 await EndpointsService.db.SaveChangesAsync();
 
@@ -43,7 +43,7 @@ namespace MinhaPrimeiraAPI.Services
                     { "Error: ", $"The requested username '{request.Username}' already exists"}
                 });
         }
-        public async Task<IResult> LoginAsync(UserModel request)
+        public async Task<IResult> LoginAsync(User request)
         {
             var user = await EndpointsService.db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
@@ -53,7 +53,7 @@ namespace MinhaPrimeiraAPI.Services
                     { "Error: ", $"The requested email '{request.Email}' do not exists"}
                 });
             }
-            if (new PasswordHasher<UserModel>().VerifyHashedPassword(user, user.PasswordHash, request.PasswordHash) == PasswordVerificationResult.Failed)
+            if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.PasswordHash) == PasswordVerificationResult.Failed)
             {
                 return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
                 {
@@ -63,7 +63,7 @@ namespace MinhaPrimeiraAPI.Services
             string token = CreateToken(user);
             return Results.Ok(token);
         }
-        private static string CreateToken(UserModel user)
+        private static string CreateToken(User user)
         {
             var claims = new List<Claim>
             {

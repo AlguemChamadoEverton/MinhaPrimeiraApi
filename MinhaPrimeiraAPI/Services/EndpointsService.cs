@@ -28,11 +28,11 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
 
             });
-            app.MapPost("/", (UserModel request) =>
+            app.MapPost("/", (User request) =>
             {
                 return auth.RegisterAsync(request);
             }).WithParameterValidation();
-            app.MapPost("/login", (UserModel request) =>
+            app.MapPost("/login", (User request) =>
             {
                 return auth.LoginAsync(request);
             }).WithParameterValidation();
@@ -57,7 +57,7 @@ namespace MinhaPrimeiraAPI.Endpoints
                 return RoutineService.GetRoutine(jwt);
                 
             }).RequireAuthorization().WithParameterValidation();
-            app.MapPost("/routines", (ClaimsPrincipal jwt, RoutineModel routine) =>
+            app.MapPost("/routines", (ClaimsPrincipal jwt, Routine routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
 

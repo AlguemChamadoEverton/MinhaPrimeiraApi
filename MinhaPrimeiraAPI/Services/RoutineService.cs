@@ -8,7 +8,7 @@ namespace MinhaPrimeiraAPI.Services
 {
     public class RoutineService
     {
-        public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, RoutineModel routine) 
+        public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, Routine routine) 
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
             routine.User = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);

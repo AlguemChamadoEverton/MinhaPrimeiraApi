@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MinhaPrimeiraAPI.Models
 {
-    public class UserModel
+    public class User
     {
         public int Id { get; set; }
         [Required]
@@ -13,7 +13,7 @@ namespace MinhaPrimeiraAPI.Models
         public string Email { get; set; } = string.Empty;
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
-        public List<ExerciseModel> Exercises { get; set; } = new List<ExerciseModel>();
-        public ICollection<RoutineModel> Routines { get; set; } = new List<RoutineModel>();
+        public List<Exercise> Exercises { get; set; } = new List<Exercise>();
+        public ICollection<Routine> Routines { get; set; } = new List<Routine>();
     }
 }

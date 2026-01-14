@@ -2,14 +2,13 @@
 
 namespace MinhaPrimeiraAPI.Models
 {
-    public class RoutineModel
+    public class Routine
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         public int UserId { get; set; }
-        public UserModel User { get; set; } = null!;
-        [Required]
-        public ICollection<ExerciseMuscleModel> ExerciseMuscles { get; set; } = new List<ExerciseMuscleModel>();
+        public User User { get; set; } = null!;
+        public List<ExerciseMuscleRoutine> ExerciseMuscleRoutine { get; set; } = null!;
     }
 }

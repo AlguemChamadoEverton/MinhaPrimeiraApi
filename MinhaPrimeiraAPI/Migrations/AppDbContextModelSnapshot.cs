@@ -21,22 +21,7 @@ namespace MinhaPrimeiraAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ExerciseMuscleModelRoutineModel", b =>
-                {
-                    b.Property<int>("ExerciseMusclesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoutinesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ExerciseMusclesId", "RoutinesId");
-
-                    b.HasIndex("RoutinesId");
-
-                    b.ToTable("ExerciseMuscleModelRoutineModel");
-                });
-
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Exercise", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +46,7 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.ToTable("Exercises");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,7 +72,35 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.ToTable("ExerciseMuscles");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.MuscleModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscleRoutine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExerciseMuscleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ExerciseMuscleId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoutineId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseMuscleId");
+
+                    b.HasIndex("ExerciseMuscleId1");
+
+                    b.HasIndex("RoutineId");
+
+                    b.ToTable("ExerciseMuscleRoutine");
+                });
+
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Muscle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,7 +117,7 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.ToTable("Muscles");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.RoutineModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Routine", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -126,7 +139,7 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.ToTable("Routines");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.UserModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -151,24 +164,9 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ExerciseMuscleModelRoutineModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Exercise", b =>
                 {
-                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", null)
-                        .WithMany()
-                        .HasForeignKey("ExerciseMusclesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MinhaPrimeiraAPI.Models.RoutineModel", null)
-                        .WithMany()
-                        .HasForeignKey("RoutinesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
-                {
-                    b.HasOne("MinhaPrimeiraAPI.Models.UserModel", "User")
+                    b.HasOne("MinhaPrimeiraAPI.Models.User", "User")
                         .WithMany("Exercises")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -177,15 +175,15 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscleModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscle", b =>
                 {
-                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseModel", "Exercise")
+                    b.HasOne("MinhaPrimeiraAPI.Models.Exercise", "Exercise")
                         .WithMany("ExerciseMuscles")
                         .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MinhaPrimeiraAPI.Models.MuscleModel", "Muscle")
+                    b.HasOne("MinhaPrimeiraAPI.Models.Muscle", "Muscle")
                         .WithMany("ExerciseMuscles")
                         .HasForeignKey("MuscleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -196,9 +194,32 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.Navigation("Muscle");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.RoutineModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscleRoutine", b =>
                 {
-                    b.HasOne("MinhaPrimeiraAPI.Models.UserModel", "User")
+                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseMuscle", "ExerciseMuscle")
+                        .WithMany()
+                        .HasForeignKey("ExerciseMuscleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MinhaPrimeiraAPI.Models.ExerciseMuscle", null)
+                        .WithMany("ExerciseMuscleRoutines")
+                        .HasForeignKey("ExerciseMuscleId1");
+
+                    b.HasOne("MinhaPrimeiraAPI.Models.Routine", "Routine")
+                        .WithMany("ExerciseMuscleRoutine")
+                        .HasForeignKey("RoutineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ExerciseMuscle");
+
+                    b.Navigation("Routine");
+                });
+
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Routine", b =>
+                {
+                    b.HasOne("MinhaPrimeiraAPI.Models.User", "User")
                         .WithMany("Routines")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -207,17 +228,27 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Exercise", b =>
                 {
                     b.Navigation("ExerciseMuscles");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.MuscleModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.ExerciseMuscle", b =>
+                {
+                    b.Navigation("ExerciseMuscleRoutines");
+                });
+
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Muscle", b =>
                 {
                     b.Navigation("ExerciseMuscles");
                 });
 
-            modelBuilder.Entity("MinhaPrimeiraAPI.Models.UserModel", b =>
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.Routine", b =>
+                {
+                    b.Navigation("ExerciseMuscleRoutine");
+                });
+
+            modelBuilder.Entity("MinhaPrimeiraAPI.Models.User", b =>
                 {
                     b.Navigation("Exercises");
 

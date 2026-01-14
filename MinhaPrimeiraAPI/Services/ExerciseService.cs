@@ -61,7 +61,7 @@ namespace MinhaPrimeiraAPI.Services
                 if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
                 {
                     var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-                    ExerciseModel result = new()
+                    Exercise result = new()
                     {
                         Name = exercise,
                         Muscles = muscleobject,
