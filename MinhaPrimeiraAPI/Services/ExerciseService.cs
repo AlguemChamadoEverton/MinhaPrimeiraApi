@@ -61,11 +61,13 @@ namespace MinhaPrimeiraAPI.Services
                 if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
                 {
                     var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+                    var user = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);
                     Exercise result = new()
                     {
                         Name = exercise,
                         Muscles = muscleobject,
-                        User = await EndpointsService.db.Users.FirstAsync(x => x.Email == email)
+                        User = user,
+                        UserId = user.Id
                     };
                     await EndpointsService.db.Exercises.AddAsync(result);
                     var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());

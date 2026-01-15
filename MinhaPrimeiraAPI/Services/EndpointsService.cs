@@ -28,35 +28,43 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
 
             });
+
             app.MapPost("/", (User request) =>
             {
                 return auth.RegisterAsync(request);
             }).WithParameterValidation();
+
             app.MapPost("/login", (User request) =>
             {
                 return auth.LoginAsync(request);
-            }).WithParameterValidation();
+            });
+
             app.MapGet("/exercise", () => 
             {
                 return ExerciseService.GetExercises();
             }).WithParameterValidation();
+
             app.MapGet("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.GetExerciseById(id);
             }).WithParameterValidation();
+
             app.MapPost("/exercise", (ExerciseDTO model, ClaimsPrincipal jwt) =>
             {
                 return ExerciseService.CreateExercise(model, jwt);
             }).RequireAuthorization().WithParameterValidation();
+
             app.MapDelete("/exercise/{id}", (int id) =>
             {
                 return ExerciseService.DeleteExerciseById(id);
-            }).WithParameterValidation();
+            }).WithParameterValidation().RequireAuthorization();
+
             app.MapGet("/routines", (ClaimsPrincipal jwt) =>
             {
                 return RoutineService.GetRoutine(jwt);
                 
             }).RequireAuthorization().WithParameterValidation();
+
             app.MapPost("/routines", (ClaimsPrincipal jwt, Routine routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
