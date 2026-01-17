@@ -13,7 +13,7 @@ namespace MinhaPrimeiraAPI.Services
             var exercisesTask = await EndpointsService.db.Exercises.ToListAsync();
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
             var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.ToListAsync();
-            
+
             var exIds = exercisesTask.Select(x => x.Id).ToList();
 
             var result = new ExerciseDTO
@@ -50,7 +50,7 @@ namespace MinhaPrimeiraAPI.Services
             };
             return TypedResults.Ok(result);
         }
-        public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt) 
+        public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt)
         {
             string exercise = ex.ExerciseName.First();
             if (!await EndpointsService.db.Exercises.AnyAsync(b => b.Name.ToLower() == exercise.ToLower()))
@@ -87,19 +87,24 @@ namespace MinhaPrimeiraAPI.Services
                     { "Error: ", $"The requested name '{exercise}' is already registered"}
                 });
         }
-        public static async Task<IResult> DeleteExerciseById(int id)
+        public static async Task<IResult> DeleteExerciseById(int id, ClaimsPrincipal jwt)
         {
-            var result = await EndpointsService.db.Exercises.FirstOrDefaultAsync(exercice => exercice.Id == id);
-            if (result is not null)
+            var exercise = await EndpointsService.db.Exercises.FirstOrDefaultAsync(m => m.Id == id);
+            if (exercise == null) return Results.Problem(statusCode: 404, extensions: new Dictionary<string, object?>
             {
-                EndpointsService.db.Exercises.Remove(result);
+                {"Error: ", $"The requested Id {id} was not found"}
+            });
+            else if (jwt.FindFirst(ClaimTypes.Email)?.Value ==
+                exercise.User.Email)
+            {
+                EndpointsService.db.Exercises.Remove(exercise);
                 await EndpointsService.db.SaveChangesAsync();
                 return Results.NoContent();
             }
             return Results.Problem(statusCode: 404, extensions: new Dictionary<string, object?>
-                {
-                    {"Error: ", $"The requested Id {id} was not found"}
-                });
+            {
+                {"Error: ", $"You can only delete your own exercises"}
+            });
         }
     }
 }

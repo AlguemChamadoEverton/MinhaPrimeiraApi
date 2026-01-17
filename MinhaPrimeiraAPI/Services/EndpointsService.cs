@@ -54,9 +54,9 @@ namespace MinhaPrimeiraAPI.Endpoints
                 return ExerciseService.CreateExercise(model, jwt);
             }).RequireAuthorization().WithParameterValidation();
 
-            app.MapDelete("/exercise/{id}", (int id) =>
+            app.MapDelete("/exercise/{id}", (int id, ClaimsPrincipal jwt) =>
             {
-                return ExerciseService.DeleteExerciseById(id);
+                return ExerciseService.DeleteExerciseById(id, jwt);
             }).WithParameterValidation().RequireAuthorization();
 
             app.MapGet("/routines", (ClaimsPrincipal jwt) =>

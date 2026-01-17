@@ -11,8 +11,6 @@ namespace MinhaPrimeiraAPI.Services
 
         public static abstract Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt);
 
-        public static abstract Task<IResult> DeleteExerciseById(int id);
-       
-
+        public static abstract Task<IResult> DeleteExerciseById(int id, ClaimsPrincipal jwt);
     }
 }
