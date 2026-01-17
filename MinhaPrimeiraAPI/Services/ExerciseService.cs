@@ -8,11 +8,14 @@ namespace MinhaPrimeiraAPI.Services
 {
     public class ExerciseService : IExerciseService
     {
-        public static async Task<IResult> GetExercises()
+        public static async Task<IResult> GetExercises(ClaimsPrincipal jwt)
         {
-            var exercisesTask = await EndpointsService.db.Exercises.ToListAsync();
+            var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+            var exercisesTask = await EndpointsService.db.Exercises.Where(
+                ex => (ex.User.Email == email) || ex.IsCustom == false).ToListAsync();
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
-            var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.ToListAsync();
+            var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.Where(
+                exm => (exm.Exercise.User.Email == email) || exm.Exercise.IsCustom == false).ToListAsync();
 
             var exIds = exercisesTask.Select(x => x.Id).ToList();
 
@@ -22,33 +25,42 @@ namespace MinhaPrimeiraAPI.Services
                 MuscleName = musclesTask.Select(m => m.Name).ToList(),
                 MainMuscle = exercisemusclesTask.Where(exm => exIds.Contains(exm.ExerciseId)).Select(x => x.Muscle.Name).ToList()
             };
-
             return Results.Ok(result);
         }
-        public static async Task<IResult> GetExerciseById(int id)
+        public static async Task<IResult> GetExerciseById(int id, ClaimsPrincipal jwt)
         {
-            var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Where(em => em.ExerciseId == id).ToListAsync();
-            if (exercisemuscle.Count == 0)
-            {
-                return Results.Problem(statusCode: 404, extensions:
-                    new Dictionary<string, object?>
-                    {
-                        { "Error: ", $"The requested Id {id} was not found"}
-                    }
-                );
-            }
             var exercise = await EndpointsService.db.Exercises.FirstOrDefaultAsync(ex => ex.Id == id);
-            var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
-            var mainmuscle = exercisemuscle.First(a => a.ExerciseId == id && a.Type == true);
-            var muscles = await EndpointsService.db.Muscles
-            .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
-            var result = new ExerciseDTO()
+            if (exercise is not null)
             {
-                ExerciseName = [exercise.Name],
-                MuscleName = muscles.Select(e => e.Name).ToList(),
-                MainMuscle = [muscles.First(b => b.Id == mainmuscle.MuscleId).Name]
-            };
-            return TypedResults.Ok(result);
+                exercise.User = await EndpointsService.db.Users.FirstAsync(x => x.Id == exercise.UserId);
+                if ((jwt.FindFirst(ClaimTypes.Email)?.Value ==
+                    exercise.User.Email) || exercise.IsCustom == false)
+                {
+                    var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Where(em => em.ExerciseId == id).ToListAsync();
+                    var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
+                    var mainmuscle = exercisemuscle.First(a => a.ExerciseId == id && a.Type == true);
+                    var muscles = await EndpointsService.db.Muscles
+                    .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
+                    var result = new ExerciseDTO()
+                    {
+                        ExerciseName = [exercise.Name],
+                        MuscleName = muscles.Select(e => e.Name).ToList(),
+                        MainMuscle = [muscles.First(b => b.Id == mainmuscle.MuscleId).Name]
+                    };
+                    return TypedResults.Ok(result);
+                }
+                return Results.Problem(statusCode: 404, extensions:
+                new Dictionary<string, object?>
+                {
+                    { "Error: ", $"You can only see your own exercises"}
+                });
+            }
+            return Results.Problem(statusCode: 404, extensions:
+                new Dictionary<string, object?>
+                {
+                    { "Error: ", $"The requested Id {id} was not found"}
+                }
+            );
         }
         public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt)
         {
@@ -94,7 +106,8 @@ namespace MinhaPrimeiraAPI.Services
             {
                 {"Error: ", $"The requested Id {id} was not found"}
             });
-            else if (jwt.FindFirst(ClaimTypes.Email)?.Value ==
+            exercise.User = await EndpointsService.db.Users.FirstAsync(f => exercise.UserId == f.Id);
+            if (jwt.FindFirst(ClaimTypes.Email)?.Value ==
                 exercise.User.Email)
             {
                 EndpointsService.db.Exercises.Remove(exercise);

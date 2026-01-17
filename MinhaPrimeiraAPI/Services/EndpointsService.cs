@@ -39,15 +39,15 @@ namespace MinhaPrimeiraAPI.Endpoints
                 return auth.LoginAsync(request);
             });
 
-            app.MapGet("/exercise", () => 
+            app.MapGet("/exercise", (ClaimsPrincipal jwt) => 
             {
-                return ExerciseService.GetExercises();
-            }).WithParameterValidation();
+                return ExerciseService.GetExercises(jwt);
+            }).WithParameterValidation().RequireAuthorization();
 
-            app.MapGet("/exercise/{id}", (int id) =>
+            app.MapGet("/exercise/{id}", (int id, ClaimsPrincipal jwt) =>
             {
-                return ExerciseService.GetExerciseById(id);
-            }).WithParameterValidation();
+                return ExerciseService.GetExerciseById(id, jwt);
+            }).WithParameterValidation().RequireAuthorization();
 
             app.MapPost("/exercise", (ExerciseDTO model, ClaimsPrincipal jwt) =>
             {
