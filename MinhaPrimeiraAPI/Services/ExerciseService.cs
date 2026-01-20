@@ -64,40 +64,32 @@ namespace MinhaPrimeiraAPI.Services
         }
         public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt)
         {
-            string exercise = ex.ExerciseName.First();
-            if (!await EndpointsService.db.Exercises.AnyAsync(b => b.Name.ToLower() == exercise.ToLower()))
+            ex.MuscleName.Add(ex.MainMuscle.First());
+            var muscleobject = (await EndpointsService.db.Muscles.Where(
+                m => ex.MuscleName.Contains(m.Name)).ToListAsync());
+            if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
             {
-                ex.MuscleName.Add(ex.MainMuscle.First());
-                var muscleobject = (await EndpointsService.db.Muscles.Where(
-                    m => ex.MuscleName.Contains(m.Name)).ToListAsync());
-                if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
+                var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+                var user = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);
+                Exercise result = new()
                 {
-                    var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-                    var user = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);
-                    Exercise result = new()
-                    {
-                        Name = exercise,
-                        Muscles = muscleobject,
-                        User = user,
-                        UserId = user.Id
-                    };
-                    await EndpointsService.db.Exercises.AddAsync(result);
-                    var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());
-                    await EndpointsService.db.SaveChangesAsync();
-                    EndpointsService.db.ExerciseMuscles.First(
-                        b => (b.ExerciseId == result.Id) && (b.MuscleId == main.Id)).Type = true;
-                    await EndpointsService.db.SaveChangesAsync();
-                    return TypedResults.Created($"/exercise/{result.Id}", ex);
-                }
-                return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
-                {
-                    { "Error: ", $"All muscles needs to be valid!"}
-                });
+                    Name = ex.ExerciseName.First(),
+                    Muscles = muscleobject,
+                    User = user,
+                    UserId = user.Id
+                };
+                await EndpointsService.db.Exercises.AddAsync(result);
+                var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());
+                await EndpointsService.db.SaveChangesAsync();
+                EndpointsService.db.ExerciseMuscles.First(
+                    b => (b.ExerciseId == result.Id) && (b.MuscleId == main.Id)).Type = true;
+                await EndpointsService.db.SaveChangesAsync();
+                return TypedResults.Created($"/exercise/{result.Id}", ex);
             }
             return Results.Problem(statusCode: 400, extensions: new Dictionary<string, object?>
-                {
-                    { "Error: ", $"The requested name '{exercise}' is already registered"}
-                });
+            {
+                { "Error: ", $"All muscles needs to be valid!"}
+            });
         }
         public static async Task<IResult> DeleteExerciseById(int id, ClaimsPrincipal jwt)
         {
