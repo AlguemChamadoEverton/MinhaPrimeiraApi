@@ -29,10 +29,15 @@ namespace MinhaPrimeiraAPI.Endpoints
 
             });
 
-            app.MapPost("/", (User request) =>
+            app.MapPost("/", () =>
+            {
+                return Results.Ok(); // Implementar a tela inicial posteriormente
+            }).WithParameterValidation().RequireAuthorization();
+
+            app.MapPost("/register", (User request) =>
             {
                 return auth.RegisterAsync(request);
-            }).WithParameterValidation();
+            }).WithParameterValidation().RequireAuthorization();
 
             app.MapPost("/login", (User request) =>
             {
@@ -65,7 +70,7 @@ namespace MinhaPrimeiraAPI.Endpoints
                 
             }).RequireAuthorization().WithParameterValidation();
 
-            app.MapPost("/routines", (ClaimsPrincipal jwt, Routine routine) =>
+            app.MapPost("/create-routine", (ClaimsPrincipal jwt, Routine routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
 
