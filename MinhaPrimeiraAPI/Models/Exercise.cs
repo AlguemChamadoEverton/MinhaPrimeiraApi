@@ -11,7 +11,9 @@ namespace MinhaPrimeiraAPI.Models
         public bool IsCustom { get; set; } = true;
         [Required]
         public List<Muscle> Muscles { get; set; } = [];
-        public List<ExerciseMuscle> ExerciseMuscles { get; set; } = [];
+        public ICollection<ExerciseMuscle> ExerciseMuscles { get; set; } = [];
+        public ICollection<Routine> Routines { get; set; } = [];
+        public ICollection<ExerciseRoutine> ExerciseRoutines { get; set; } = [];
         public int UserId { get; set; }
         public User User { get; set; } = null!;
     }

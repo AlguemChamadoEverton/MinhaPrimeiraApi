@@ -5,7 +5,7 @@
 namespace MinhaPrimeiraAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,51 +107,31 @@ namespace MinhaPrimeiraAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExerciseMuscleRoutine",
+                name: "ExerciseRoutines",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExerciseMuscleId = table.Column<int>(type: "int", nullable: false),
+                    ExerciseId = table.Column<int>(type: "int", nullable: false),
                     RoutineId = table.Column<int>(type: "int", nullable: false),
-                    ExerciseMuscleId1 = table.Column<int>(type: "int", nullable: true)
+                    Sets = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExerciseMuscleRoutine", x => x.Id);
+                    table.PrimaryKey("PK_ExerciseRoutines", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExerciseMuscleRoutine_ExerciseMuscles_ExerciseMuscleId",
-                        column: x => x.ExerciseMuscleId,
-                        principalTable: "ExerciseMuscles",
+                        name: "FK_ExerciseRoutines_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExerciseMuscleRoutine_ExerciseMuscles_ExerciseMuscleId1",
-                        column: x => x.ExerciseMuscleId1,
-                        principalTable: "ExerciseMuscles",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ExerciseMuscleRoutine_Routines_RoutineId",
+                        name: "FK_ExerciseRoutines_Routines_RoutineId",
                         column: x => x.RoutineId,
                         principalTable: "Routines",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExerciseMuscleRoutine_ExerciseMuscleId",
-                table: "ExerciseMuscleRoutine",
-                column: "ExerciseMuscleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExerciseMuscleRoutine_ExerciseMuscleId1",
-                table: "ExerciseMuscleRoutine",
-                column: "ExerciseMuscleId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExerciseMuscleRoutine_RoutineId",
-                table: "ExerciseMuscleRoutine",
-                column: "RoutineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExerciseMuscles_ExerciseId",
@@ -162,6 +142,16 @@ namespace MinhaPrimeiraAPI.Migrations
                 name: "IX_ExerciseMuscles_MuscleId",
                 table: "ExerciseMuscles",
                 column: "MuscleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExerciseRoutines_ExerciseId",
+                table: "ExerciseRoutines",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExerciseRoutines_RoutineId",
+                table: "ExerciseRoutines",
+                column: "RoutineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exercises_UserId",
@@ -178,19 +168,19 @@ namespace MinhaPrimeiraAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ExerciseMuscleRoutine");
-
-            migrationBuilder.DropTable(
                 name: "ExerciseMuscles");
 
             migrationBuilder.DropTable(
-                name: "Routines");
+                name: "ExerciseRoutines");
+
+            migrationBuilder.DropTable(
+                name: "Muscles");
 
             migrationBuilder.DropTable(
                 name: "Exercises");
 
             migrationBuilder.DropTable(
-                name: "Muscles");
+                name: "Routines");
 
             migrationBuilder.DropTable(
                 name: "Users");

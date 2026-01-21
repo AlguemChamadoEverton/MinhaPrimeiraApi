@@ -11,7 +11,7 @@ namespace MinhaPrimeiraAPI.Services
         public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, Routine routine) 
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-            routine.User = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);
+            routine.UserId = (await EndpointsService.db.Users.FirstAsync(x => x.Email == email)).Id ;
             await EndpointsService.db.Routines.AddAsync(routine);
             await EndpointsService.db.SaveChangesAsync();
             return Results.Created();

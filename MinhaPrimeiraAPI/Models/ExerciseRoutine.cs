@@ -2,13 +2,13 @@
 
 namespace MinhaPrimeiraAPI.Models
 {
-    public class ExerciseMuscle
+    public class ExerciseRoutine
     {
         public int Id { get; set; }
         public int ExerciseId { get; set; }
-        public int MuscleId { get; set; }
-        public bool Type { get; set; } = false;
+        public int RoutineId { get; set; }
+        public int Sets { get; set; }
         public Exercise Exercise { get; set; } = null!;
-        public Muscle Muscle { get; set; } = null!;
+        public Routine Routine { get; set; } = null!;
     }
 }

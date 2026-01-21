@@ -17,6 +17,7 @@ namespace MinhaPrimeiraAPI.Data
         public DbSet<Routine> Routines { get; set; }
         public DbSet<Muscle> Muscles { get; set; }
         public DbSet<ExerciseMuscle> ExerciseMuscles { get; set; }
+        public DbSet<ExerciseRoutine> ExerciseRoutines { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -27,18 +28,17 @@ namespace MinhaPrimeiraAPI.Data
                     r => r.HasOne<Muscle>(e => e.Muscle).WithMany(e => e.ExerciseMuscles),
                     l => l.HasOne<Exercise>(e => e.Exercise).WithMany(e => e.ExerciseMuscles));
 
-            modelBuilder.Entity<ExerciseMuscleRoutine>(entity =>
+            modelBuilder.Entity<Routine>(entity =>
             {
-                entity.HasOne(emr => emr.Routine)
-                      .WithMany(r => r.ExerciseMuscleRoutine)
-                      .HasForeignKey(emr => emr.RoutineId)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(emr => emr.ExerciseMuscle)
-                      .WithMany()
-                      .HasForeignKey(emr => emr.ExerciseMuscleId);
+                entity.HasMany(r => r.Exercises)
+                     .WithMany(e => e.Routines)
+                     .UsingEntity<ExerciseRoutine>(
+                        l => l.HasOne<Exercise>(e => e.Exercise).WithMany(e => e.ExerciseRoutines).OnDelete(DeleteBehavior.Restrict),
+                        r => r.HasOne<Routine>(e => e.Routine).WithMany(e => e.ExerciseRoutines).OnDelete(DeleteBehavior.Restrict)
+                    );
+                     //.HasForeignKey(emr => emr.RoutineId)
+                     //.OnDelete(DeleteBehavior.Restrict);
             });
-
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Exercises)
