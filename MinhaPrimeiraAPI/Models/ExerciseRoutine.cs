@@ -7,7 +7,7 @@ namespace MinhaPrimeiraAPI.Models
         public int Id { get; set; }
         public int ExerciseId { get; set; }
         public int RoutineId { get; set; }
-        public int Sets { get; set; }
+        public List<Set> Sets { get; set; } = new List<Set>();
         public Exercise Exercise { get; set; } = null!;
         public Routine Routine { get; set; } = null!;
     }
