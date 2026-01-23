@@ -37,7 +37,7 @@ namespace MinhaPrimeiraAPI.Endpoints
             app.MapPost("/register", (User request) =>
             {
                 return auth.RegisterAsync(request);
-            }).WithParameterValidation().RequireAuthorization();
+            }).WithParameterValidation();
 
             app.MapPost("/login", (User request) =>
             {
@@ -70,12 +70,20 @@ namespace MinhaPrimeiraAPI.Endpoints
                 
             }).RequireAuthorization().WithParameterValidation();
 
+            app.MapGet("/create-routine", (ClaimsPrincipal jwt) =>
+            {
+                return RoutineService.GetCreateRoutine(jwt);
+
+
+            }).RequireAuthorization().WithParameterValidation();
+
             app.MapPost("/create-routine", (ClaimsPrincipal jwt, Routine routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
 
 
             }).RequireAuthorization().WithParameterValidation();
+
         }
     }
 }

@@ -152,7 +152,7 @@ namespace MinhaPrimeiraAPI.Migrations
 
                     b.HasIndex("ExerciseRoutineId");
 
-                    b.ToTable("Set");
+                    b.ToTable("Sets");
                 });
 
             modelBuilder.Entity("MinhaPrimeiraAPI.Models.User", b =>

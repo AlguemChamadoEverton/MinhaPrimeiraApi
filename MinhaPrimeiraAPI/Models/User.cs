@@ -14,6 +14,7 @@ namespace MinhaPrimeiraAPI.Models
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
         public List<Exercise> Exercises { get; set; } = new List<Exercise>();
+        [MaxLength(3)]
         public ICollection<Routine> Routines { get; set; } = new List<Routine>();
     }
 }

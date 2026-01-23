@@ -1,13 +1,29 @@
-﻿using Azure.Core;
+﻿using Microsoft.EntityFrameworkCore;
+using MinhaPrimeiraAPI.DTOs;
 using MinhaPrimeiraAPI.Endpoints;
 using MinhaPrimeiraAPI.Models;
-using System.Data.Entity;
 using System.Security.Claims;
 
 namespace MinhaPrimeiraAPI.Services
 {
     public class RoutineService
     {
+        public static async Task<IResult> GetCreateRoutine(ClaimsPrincipal jwt)
+        {
+            var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+            var exercises = await EndpointsService.db.Exercises.Where(e => (e.User.Email == email) || !e.IsCustom).ToListAsync();
+            var muscle = await EndpointsService.db.Muscles.ToListAsync();
+            var query = (await EndpointsService.db.ExerciseMuscles.Where(e => (e.Type == true) &&
+            (exercises.Contains(e.Exercise))).ToListAsync()).Select(b => b.MuscleId).ToList();
+            var mainmuscles = muscle.Where(m => query.Contains(m.Id));
+
+            return TypedResults.Ok(new ExerciseDTO()
+            {
+                ExerciseName = exercises.Select(e => e.Name).ToList(),
+                MuscleName = muscle.Select(m => m.Name).ToList(),
+                MainMuscle = mainmuscles.Select(mm => mm.Name).ToList()
+            });
+        }
         public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, Routine routine) 
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;

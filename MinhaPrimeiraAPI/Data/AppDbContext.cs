@@ -18,6 +18,7 @@ namespace MinhaPrimeiraAPI.Data
         public DbSet<Muscle> Muscles { get; set; }
         public DbSet<ExerciseMuscle> ExerciseMuscles { get; set; }
         public DbSet<ExerciseRoutine> ExerciseRoutines { get; set; }
+        public DbSet<Set> Sets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
