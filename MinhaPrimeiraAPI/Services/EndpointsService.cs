@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using MinhaPrimeiraAPI.Data;
-using MinhaPrimeiraAPI.DTOs;
 using MinhaPrimeiraAPI.Models;
-using MinhaPrimeiraAPI.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Data.Entity;
@@ -15,6 +13,9 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using MinimalApis.Extensions;
+using MinhaPrimeiraAPI.Services.AuthService;
+using MinhaPrimeiraAPI.Services.ExerciseService;
+using MinhaPrimeiraAPI.Services.RoutineService;
 
 namespace MinhaPrimeiraAPI.Endpoints
 {

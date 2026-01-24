@@ -1,9 +1,8 @@
-﻿using MinhaPrimeiraAPI.DTOs;
-using MinhaPrimeiraAPI.Endpoints;
+﻿using MinhaPrimeiraAPI.Endpoints;
 using MinhaPrimeiraAPI.Models;
 using System.Security.Claims;
 
-namespace MinhaPrimeiraAPI.Services
+namespace MinhaPrimeiraAPI.Services.ExerciseService
 {
     public interface IExerciseService
     {

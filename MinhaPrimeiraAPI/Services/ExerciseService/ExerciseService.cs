@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MinhaPrimeiraAPI.DTOs;
 using MinhaPrimeiraAPI.Endpoints;
 using MinhaPrimeiraAPI.Models;
 using System.Security.Claims;
 
-namespace MinhaPrimeiraAPI.Services
+namespace MinhaPrimeiraAPI.Services.ExerciseService
 {
     public class ExerciseService : IExerciseService
     {
@@ -12,10 +11,10 @@ namespace MinhaPrimeiraAPI.Services
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
             var exercisesTask = await EndpointsService.db.Exercises.Where(
-                ex => (ex.User.Email == email) || ex.IsCustom == false).ToListAsync();
+                ex => ex.User.Email == email || ex.IsCustom == false).ToListAsync();
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
             var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.Where(
-                exm => (exm.Exercise.User.Email == email) || exm.Exercise.IsCustom == false).ToListAsync();
+                exm => exm.Exercise.User.Email == email || exm.Exercise.IsCustom == false).ToListAsync();
 
             var exIds = exercisesTask.Select(x => x.Id).ToList();
 
@@ -33,8 +32,8 @@ namespace MinhaPrimeiraAPI.Services
             if (exercise is not null)
             {
                 exercise.User = await EndpointsService.db.Users.FirstAsync(x => x.Id == exercise.UserId);
-                if ((jwt.FindFirst(ClaimTypes.Email)?.Value ==
-                    exercise.User.Email) || exercise.IsCustom == false)
+                if (jwt.FindFirst(ClaimTypes.Email)?.Value ==
+                    exercise.User.Email || exercise.IsCustom == false)
                 {
                     var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Where(em => em.ExerciseId == id).ToListAsync();
                     var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
@@ -65,9 +64,9 @@ namespace MinhaPrimeiraAPI.Services
         public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt)
         {
             ex.MuscleName.Add(ex.MainMuscle.First());
-            var muscleobject = (await EndpointsService.db.Muscles.Where(
-                m => ex.MuscleName.Contains(m.Name)).ToListAsync());
-            if ((muscleobject.Count == ex.MuscleName.Count) && muscleobject.Count > 0)
+            var muscleobject = await EndpointsService.db.Muscles.Where(
+                m => ex.MuscleName.Contains(m.Name)).ToListAsync();
+            if (muscleobject.Count == ex.MuscleName.Count && muscleobject.Count > 0)
             {
                 var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
                 var user = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);
@@ -82,7 +81,7 @@ namespace MinhaPrimeiraAPI.Services
                 var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());
                 await EndpointsService.db.SaveChangesAsync();
                 EndpointsService.db.ExerciseMuscles.First(
-                    b => (b.ExerciseId == result.Id) && (b.MuscleId == main.Id)).Type = true;
+                    b => b.ExerciseId == result.Id && b.MuscleId == main.Id).Type = true;
                 await EndpointsService.db.SaveChangesAsync();
                 return TypedResults.Created($"/exercise/{result.Id}", ex);
             }

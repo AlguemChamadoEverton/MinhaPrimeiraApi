@@ -4,7 +4,7 @@ using MinhaPrimeiraAPI.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MinhaPrimeiraAPI.Services;
+using MinhaPrimeiraAPI.Services.AuthService;
 
 var builder = WebApplication.CreateBuilder(args);
 

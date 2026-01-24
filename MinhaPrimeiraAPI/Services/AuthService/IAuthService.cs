@@ -1,7 +1,7 @@
 ﻿using MinhaPrimeiraAPI.Data;
 using MinhaPrimeiraAPI.Models;
 
-namespace MinhaPrimeiraAPI.Services
+namespace MinhaPrimeiraAPI.Services.AuthService
 {
     public interface IAuthService
     {

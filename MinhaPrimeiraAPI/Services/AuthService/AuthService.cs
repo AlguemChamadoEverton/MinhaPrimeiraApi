@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using MinhaPrimeiraAPI.Endpoints;
 
-namespace MinhaPrimeiraAPI.Services
+namespace MinhaPrimeiraAPI.Services.AuthService
 {
     public class AuthService : IAuthService
     {

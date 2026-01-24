@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MinhaPrimeiraAPI.DTOs
+namespace MinhaPrimeiraAPI.Services.ExerciseService
 {
     public class ExerciseDTO
     {
