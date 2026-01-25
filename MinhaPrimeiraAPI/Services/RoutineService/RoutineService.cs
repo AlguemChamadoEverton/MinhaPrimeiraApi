@@ -24,14 +24,30 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                 MainMuscle = mainmuscles.Select(mm => mm.Name).ToList()
             });
         }
-        public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, Routine routine) 
+        public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, RoutineDTO routine) 
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-            routine.UserId = (await EndpointsService.db.Users.FirstAsync(x => x.Email == email)).Id;
-            await EndpointsService.db.Routines.AddAsync(routine);
-            await EndpointsService.db.SaveChangesAsync();
+            var user = await EndpointsService.db.Users.FirstAsync(u =>  u.Email == email);
+            var exercises = await EndpointsService.db.Exercises.ToListAsync();
+
+            var result = new Routine
+            {
+                Name = routine.Name,
+                User = user,
+
+            };
+            foreach ((int,List<Set>) value in routine.Exercise)
+            {
+                result.Exercises = exercises.Where(e => e.Id == value.Item1).ToList();
+                ExerciseRoutines = new List<ExerciseRoutine>
+                {
+
+                }; 
+                        
+                });
+            }
+            await EndpointsService.db.Routines.AddAsync(result);
             return Results.Created();
-            //Preciso dar um jeito de criar uma rotina, ainda estava raciocinando como faria isso.
 
         }
         public static async Task<IResult> GetRoutine(ClaimsPrincipal jwt)

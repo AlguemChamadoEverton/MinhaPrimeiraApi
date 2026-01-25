@@ -78,7 +78,7 @@ namespace MinhaPrimeiraAPI.Endpoints
 
             }).RequireAuthorization().WithParameterValidation();
 
-            app.MapPost("/create-routine", (ClaimsPrincipal jwt, Routine routine) =>
+            app.MapPost("/create-routine", (ClaimsPrincipal jwt, RoutineDTO routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
 
