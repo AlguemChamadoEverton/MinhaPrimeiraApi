@@ -1,10 +1,12 @@
-﻿using MinhaPrimeiraAPI.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using MinhaPrimeiraAPI.Models;
 
 namespace MinhaPrimeiraAPI.Services.RoutineService
 {
-    public class RoutineDTO
+    public class RoutineDto
     {
         public string Name { get; set; } = string.Empty;
-        public List<(int, List<Set>)> Exercise { get; set; } = new List<(int, List<Set>)> ();
+        [Required]
+        public (int,int,List<int>) Exercises { get; set; }
     }
 }

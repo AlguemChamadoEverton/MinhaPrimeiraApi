@@ -65,10 +65,9 @@ namespace MinhaPrimeiraAPI.Endpoints
                 return ExerciseService.DeleteExerciseById(id, jwt);
             }).WithParameterValidation().RequireAuthorization();
 
-            app.MapGet("/routines", (ClaimsPrincipal jwt) =>
+            app.MapGet("/routine/", (ClaimsPrincipal jwt) =>
             {
                 return RoutineService.GetRoutine(jwt);
-                
             }).RequireAuthorization().WithParameterValidation();
 
             app.MapGet("/create-routine", (ClaimsPrincipal jwt) =>
@@ -78,7 +77,7 @@ namespace MinhaPrimeiraAPI.Endpoints
 
             }).RequireAuthorization().WithParameterValidation();
 
-            app.MapPost("/create-routine", (ClaimsPrincipal jwt, RoutineDTO routine) =>
+            app.MapPost("/create-routine", (ClaimsPrincipal jwt, RoutineDto routine) =>
             {
                 return RoutineService.CreateRoutine(jwt, routine);
 

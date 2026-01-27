@@ -24,29 +24,22 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                 MainMuscle = mainmuscles.Select(mm => mm.Name).ToList()
             });
         }
-        public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, RoutineDTO routine) 
+        public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, RoutineDto routine) 
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
             var user = await EndpointsService.db.Users.FirstAsync(u =>  u.Email == email);
-            var exercises = await EndpointsService.db.Exercises.ToListAsync();
+            var exercisesraw = await EndpointsService.db.Exercises.ToListAsync();
 
             var result = new Routine
             {
                 Name = routine.Name,
                 User = user,
-
+                Exercises = exercisesraw.Where(e => routine.Exercises).ToList()
             };
-            foreach ((int,List<Set>) value in routine.Exercise)
-            {
-                result.Exercises = exercises.Where(e => e.Id == value.Item1).ToList();
-                ExerciseRoutines = new List<ExerciseRoutine>
-                {
-
-                }; 
-                        
-                });
-            }
             await EndpointsService.db.Routines.AddAsync(result);
+            var exerciseRoutines = EndpointsService.db.ExerciseRoutines.Where(e => e.RoutineId == result.Id).ToListAsync();
+            
+            
             return Results.Created();
 
         }
