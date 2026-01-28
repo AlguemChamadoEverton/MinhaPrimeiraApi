@@ -7,6 +7,7 @@ namespace MinhaPrimeiraAPI.Models
         public int Id { get; set; }
         [Required]
         public int Reps { get; set; }
+        public int Weight { get; set; }
         public ExerciseRoutine ExerciseRoutine { get; set; } = null!;
     }
 }

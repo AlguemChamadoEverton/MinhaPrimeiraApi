@@ -7,6 +7,6 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
     {
         public string Name { get; set; } = string.Empty;
         [Required]
-        public (int,int,List<int>) Exercises { get; set; }
+        public List<(int, List<Set>)> IdSet { get; }
     }
 }
