@@ -10,7 +10,7 @@ namespace MinhaPrimeiraAPI.Data
 {
     public class AppDbContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer("Server=localhost;Database=GymTrackerDb;Trusted_Connection=True;TrustServerCertificate=True;");
+        protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseNpgsql("Host=localhost;Username=berto;Password=1234;Database=GymTrackerDb;");
 
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<User> Users { get; set; }

@@ -1,0 +1,14 @@
+INSERT INTO public."Muscles"("Name") VALUES
+('Traps'),
+('Shoulders'),
+('Triceps'),
+('Biceps'),
+('Forearms'),
+('Back'),
+('Chest'),
+('Abs'),
+('Glutes'),
+('Hamstrings'),
+('Calves'),
+('Quadriceps'),
+('Aductors');
