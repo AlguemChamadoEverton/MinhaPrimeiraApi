@@ -29,7 +29,7 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
             var user = await EndpointsService.db.Users.FirstAsync(u =>  u.Email == email);
             var exercisesraw = await EndpointsService.db.Exercises.ToListAsync();
-            var exerciseIds = routine.IdSet.Select(i => i.Item1).ToList();
+            var exerciseIds = routine.ErDtos.Select(i => i.ExerciseId).ToList();
 
             var result = new Routine
             {
@@ -38,10 +38,11 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                 Exercises = exercisesraw.Where(e => exerciseIds.Contains(e.Id)).ToList()
             };
             await EndpointsService.db.Routines.AddAsync(result);
+            await Endpoints.EndpointsService.db.SaveChangesAsync();
             var exerciseRoutines = await EndpointsService.db.ExerciseRoutines.Where(e => e.RoutineId == result.Id).ToListAsync();
-            foreach ((int, List<Set>) set in routine.IdSet)
+            foreach (ExerciseRoutineDto er in routine.ErDtos)
             {
-                exerciseRoutines.First(er => set.Item1 == er.ExerciseId).Sets = set.Item2;
+                exerciseRoutines.First(e => e.ExerciseId == er.ExerciseId).Sets = er.Sets;
             }
             EndpointsService.db.ExerciseRoutines.UpdateRange(exerciseRoutines);
             await EndpointsService.db.SaveChangesAsync();

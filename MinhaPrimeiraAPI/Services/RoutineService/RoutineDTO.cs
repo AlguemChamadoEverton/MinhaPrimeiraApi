@@ -7,6 +7,12 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
     {
         public string Name { get; set; } = string.Empty;
         [Required]
-        public List<(int, List<Set>)> IdSet { get; set; }
+        public List<ExerciseRoutineDto> ErDtos {get; set; }
     }
+    public class ExerciseRoutineDto
+    {
+        public int ExerciseId { get; set; }
+        public List<Set> Sets { get; set; } = new List<Set>();
+    }   
+    
 }
