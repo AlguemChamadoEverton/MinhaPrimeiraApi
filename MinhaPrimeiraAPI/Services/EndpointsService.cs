@@ -83,6 +83,10 @@ namespace MinhaPrimeiraAPI.Endpoints
 
 
             }).RequireAuthorization().WithParameterValidation();
+            app.MapGet("/edit-routine/{id}", (int id, ClaimsPrincipal jwt) =>
+            {
+                return RoutineService.GetEditRoutine(jwt, id);
+            }).RequireAuthorization().WithParameterValidation();
 
         }
     }

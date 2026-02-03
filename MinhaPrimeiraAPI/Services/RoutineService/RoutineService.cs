@@ -38,7 +38,7 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                 Exercises = exercisesraw.Where(e => exerciseIds.Contains(e.Id)).ToList()
             };
             await EndpointsService.db.Routines.AddAsync(result);
-            await Endpoints.EndpointsService.db.SaveChangesAsync();
+            await EndpointsService.db.SaveChangesAsync();
             var exerciseRoutines = await EndpointsService.db.ExerciseRoutines.Where(e => e.RoutineId == result.Id).ToListAsync();
             foreach (ExerciseRoutineDto er in routine.ErDtos)
             {
@@ -53,6 +53,41 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
             var routines = await EndpointsService.db.Routines.Where(r => r.User.Email == email).ToListAsync();
             return TypedResults.Ok(routines);
+        }
+
+        public static async Task<IResult> GetEditRoutine(ClaimsPrincipal jwt, int id)
+        {
+            var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await EndpointsService.db.Users.FirstAsync(u =>  u.Email == email);
+            var routine = await EndpointsService.db.Routines.FirstOrDefaultAsync(r => r.Id == id && r.User.Email == user.Email);
+            if (routine is not null)
+            {
+                var exercises = await EndpointsService.db.ExerciseRoutines.Where(er => er.RoutineId == routine.Id).Select(em => em.ExerciseId).ToListAsync();
+                var sets = await EndpointsService.db.ExerciseRoutines.Where(er => er.RoutineId == routine.Id).Select(er => er.Sets).ToListAsync();
+                
+                var dto = new List<ExerciseRoutineDto>();
+                for (int i = 0; i < exercises.Count; i++)
+                {
+                    dto.Add(new ExerciseRoutineDto()
+                    {
+                        ExerciseId = exercises[i],
+                        Sets = sets[i]
+                    });
+                }
+                var result = new RoutineDto()
+                {
+                    Name = routine.Name,
+                    ErDtos = dto,
+                    Exercises = await EndpointsService.db.Exercises.Where(e=> e.User.Email.Equals(user.Email) || e.User.Id.Equals(0)).ToListAsync(),
+                    Muscles = await EndpointsService.db.Muscles.ToListAsync()
+                };
+                return TypedResults.Ok(result);
+            }
+            return Results.Problem(statusCode: 404, extensions:
+                new Dictionary<string, object?>
+                {
+                    { "Error: ", $"Routine not found"}
+                });
         }
     }
 }
