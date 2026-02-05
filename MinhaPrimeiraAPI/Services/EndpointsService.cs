@@ -91,6 +91,10 @@ namespace MinhaPrimeiraAPI.Endpoints
             {
                 return RoutineService.EditRoutine(jwt, id, routine);
             }).RequireAuthorization().WithParameterValidation();
+            app.MapDelete("/delete-routine/{id}", (ClaimsPrincipal jwt,int id) =>
+            {
+                return RoutineService.DeleteRoutine(jwt, id);
+            }).RequireAuthorization().WithParameterValidation();
 
         }
     }

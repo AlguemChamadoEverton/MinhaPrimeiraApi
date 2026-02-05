@@ -36,6 +36,7 @@ namespace MinhaPrimeiraAPI.Data
                      .UsingEntity<ExerciseRoutine>(
                         l => l.HasOne<Exercise>(e => e.Exercise).WithMany(e => e.ExerciseRoutines).OnDelete(DeleteBehavior.Restrict),
                         r => r.HasOne<Routine>(e => e.Routine).WithMany(e => e.ExerciseRoutines).OnDelete(DeleteBehavior.Restrict)
+                            .OnDelete(DeleteBehavior.Cascade)
                     );
                      //.HasForeignKey(emr => emr.RoutineId)
                      //.OnDelete(DeleteBehavior.Restrict);

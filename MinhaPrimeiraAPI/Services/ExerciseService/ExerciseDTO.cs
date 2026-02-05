@@ -6,10 +6,17 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
 {
     public class ExerciseDTO
     {
-        public List<string> ExerciseName { get; set; } = new List<string>();
         public List<string> MuscleName { get; set; } = new List<string>();
+        public List<ExerciseMainMuscle> ExercisesMainMuscle { get; set; } = [];
+    }
+    }
+
+    public class ExerciseMainMuscle
+    {
+        public string ExerciseName { get; set; }
         [Required]
         [MinLength(1)]
-        public List<string> MainMuscle { get; set; } = [];
+        public string MainMuscle { get; set; }
+    }
     }
 }

@@ -89,7 +89,6 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                     { "Error: ", $"Routine not found"}
                 });
         }
-
         public static async Task<IResult> EditRoutine(ClaimsPrincipal jwt, int id, RoutineDto routine)
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
@@ -119,5 +118,24 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                 });
             
         }
+
+        public static async Task<IResult> DeleteRoutine(ClaimsPrincipal jwt, int id)
+        {
+            var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await EndpointsService.db.Users.FirstAsync(u =>  u.Email == email);
+            var check = await EndpointsService.db.Routines.FirstOrDefaultAsync(r => r.Id == id && r.User.Email.Equals(user.Email));
+            if (check is not null)
+            {
+                EndpointsService.db.Routines.Remove(check);
+                await EndpointsService.db.SaveChangesAsync();
+                return Results.NoContent();
+            }
+            return Results.Problem(statusCode: 404, extensions:
+                new Dictionary<string, object?>
+                {
+                    { "Error: ", $"Routine not found"}
+                });
+        }
     }
+    
 }

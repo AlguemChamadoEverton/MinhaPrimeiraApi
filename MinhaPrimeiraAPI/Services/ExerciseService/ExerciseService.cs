@@ -10,19 +10,25 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
         public static async Task<IResult> GetExercises(ClaimsPrincipal jwt)
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-            var exercisesTask = await EndpointsService.db.Exercises.Where(
-                ex => ex.User.Email == email || ex.IsCustom == false).ToListAsync();
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
-            var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.Where(
-                exm => exm.Exercise.User.Email == email || exm.Exercise.IsCustom == false).ToListAsync();
+            var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.Include(em => em.Exercise).Include(em => em.Muscle)
+                .Where(exm => exm.Exercise.User.Email == email || exm.Exercise.IsCustom == false).ToListAsync();
 
-            var exIds = exercisesTask.Select(x => x.Id).ToList();
+            var exerciseMainMuscle = new List<ExerciseMainMuscle>();
+            
+            foreach (ExerciseMuscle em in exercisemusclesTask)
+            {
+                exerciseMainMuscle.Add(new ExerciseMainMuscle()
+                {
+                    ExerciseName = em.Exercise.Name,
+                    MainMuscle = em.Muscle.Name
+                });
+            }
 
             var result = new ExerciseDTO
             {
-                ExerciseName = exercisesTask.Select(ex => ex.Name).ToList(),
+                ExercisesMainMuscle = exerciseMainMuscle,
                 MuscleName = musclesTask.Select(m => m.Name).ToList(),
-                MainMuscle = exercisemusclesTask.Where(exm => exIds.Contains(exm.ExerciseId)).Select(x => x.Muscle.Name).ToList()
             };
             return Results.Ok(result);
         }
@@ -35,16 +41,23 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
                 if (jwt.FindFirst(ClaimTypes.Email)?.Value ==
                     exercise.User.Email || exercise.IsCustom == false)
                 {
-                    var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Where(em => em.ExerciseId == id).ToListAsync();
-                    var idsToSearch = exercisemuscle.Select(e => e.MuscleId).ToList();
-                    var mainmuscle = exercisemuscle.First(a => a.ExerciseId == id && a.Type == true);
-                    var muscles = await EndpointsService.db.Muscles
-                    .Where(m => idsToSearch.Contains(m.Id)).ToListAsync();
+                    var exercisemuscle = await EndpointsService.db.ExerciseMuscles.Include(em => em.Muscle)
+                        .Include(em => em.Exercise).Where(em => em.ExerciseId == id).ToListAsync();
+
+                    var exerciseMainMuscle = new List<ExerciseMainMuscle>()
+                    {
+                        new()
+                        {
+                            ExerciseName = exercisemuscle.First().Exercise.Name,
+                            MainMuscle = exercisemuscle.First(em => em.Type).Muscle.Name
+                        }
+                    };
+                    
                     var result = new ExerciseDTO()
                     {
-                        ExerciseName = [exercise.Name],
-                        MuscleName = muscles.Select(e => e.Name).ToList(),
-                        MainMuscle = [muscles.First(b => b.Id == mainmuscle.MuscleId).Name]
+                        ExercisesMainMuscle = exerciseMainMuscle,
+                        MuscleName = exercisemuscle.Select(em => em.Muscle.Name).ToList()
+                       
                     };
                     return TypedResults.Ok(result);
                 }

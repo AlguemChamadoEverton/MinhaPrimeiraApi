@@ -224,7 +224,7 @@ namespace MinhaPrimeiraAPI.Migrations
                     b.HasOne("MinhaPrimeiraAPI.Models.Routine", "Routine")
                         .WithMany("ExerciseRoutines")
                         .HasForeignKey("RoutineId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Exercise");
