@@ -11,19 +11,27 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
         public static async Task<IResult> GetCreateRoutine(ClaimsPrincipal jwt)
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-            var exercises = await EndpointsService.db.Exercises.Where(e => e.User.Email == email || !e.IsCustom).ToListAsync();
-            var muscle = await EndpointsService.db.Muscles.ToListAsync();
-            var query = (await EndpointsService.db.ExerciseMuscles.Where(e => e.Type == true &&
-            exercises.Contains(e.Exercise)).ToListAsync()).Select(b => b.MuscleId).ToList();
-            var mainmuscles = muscle.Where(m => query.Contains(m.Id));
-
+            var user = await EndpointsService.db.Users.FirstAsync(u => u.Email == email);
+            var exercises = await EndpointsService.db.ExerciseMuscles.Include(em => em.Exercise).
+                Include(em => em.Muscle)
+                .Where(em => em.Type == true && (em.Exercise.User.Email.Equals(user.Email) || em.Exercise.User.Email.Equals("admin"))).ToListAsync();
+            var exerciseMainMuscle = new List<ExerciseMainMuscle>();
+            
+            foreach (ExerciseMuscle exercise in exercises)
+            {
+                exerciseMainMuscle.Add(new ExerciseMainMuscle()
+                {
+                    ExerciseName = exercise.Exercise.Name,
+                    MainMuscle = exercise.Muscle.Name
+                });
+            }
             return TypedResults.Ok(new ExerciseDTO()
             {
-                ExerciseName = exercises.Select(e => e.Name).ToList(),
-                MuscleName = muscle.Select(m => m.Name).ToList(),
-                MainMuscle = mainmuscles.Select(mm => mm.Name).ToList()
+                MuscleName = await EndpointsService.db.Muscles.Select(m => m.Name).ToListAsync(),
+                ExercisesMainMuscle = exerciseMainMuscle
             });
         }
+    
         public static async Task<IResult> CreateRoutine(ClaimsPrincipal jwt, RoutineDto routine) 
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;

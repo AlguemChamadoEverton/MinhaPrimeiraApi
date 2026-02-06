@@ -12,7 +12,7 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
             var musclesTask = await EndpointsService.db.Muscles.ToListAsync();
             var exercisemusclesTask = await EndpointsService.db.ExerciseMuscles.Include(em => em.Exercise).Include(em => em.Muscle)
-                .Where(exm => exm.Exercise.User.Email == email || exm.Exercise.IsCustom == false).ToListAsync();
+                .Where(exm => (exm.Exercise.User.Email == email || exm.Exercise.IsCustom == false) && exm.Type).ToListAsync();
 
             var exerciseMainMuscle = new List<ExerciseMainMuscle>();
             
@@ -76,7 +76,8 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
         }
         public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt)
         {
-            ex.MuscleName.Add(ex.MainMuscle.First());
+            var mainMuscle = ex.ExercisesMainMuscle.First().MainMuscle;
+            ex.MuscleName.Add(mainMuscle);
             var muscleobject = await EndpointsService.db.Muscles.Where(
                 m => ex.MuscleName.Contains(m.Name)).ToListAsync();
             if (muscleobject.Count == ex.MuscleName.Count && muscleobject.Count > 0)
@@ -85,13 +86,13 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
                 var user = await EndpointsService.db.Users.FirstAsync(x => x.Email == email);
                 Exercise result = new()
                 {
-                    Name = ex.ExerciseName.First(),
+                    Name = ex.ExercisesMainMuscle.First().ExerciseName,
                     Muscles = muscleobject,
                     User = user,
                     UserId = user.Id
                 };
                 await EndpointsService.db.Exercises.AddAsync(result);
-                var main = muscleobject.First(a => a.Name == ex.MainMuscle.First());
+                var main = muscleobject.First(a => a.Name == mainMuscle);
                 await EndpointsService.db.SaveChangesAsync();
                 EndpointsService.db.ExerciseMuscles.First(
                     b => b.ExerciseId == result.Id && b.MuscleId == main.Id).Type = true;
