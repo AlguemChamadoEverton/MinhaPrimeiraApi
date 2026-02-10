@@ -48,9 +48,18 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
             await EndpointsService.db.Routines.AddAsync(result);
             await EndpointsService.db.SaveChangesAsync();
             var exerciseRoutines = await EndpointsService.db.ExerciseRoutines.Where(e => e.RoutineId == result.Id).ToListAsync();
+            List<Set> sets = new List<Set>();
             foreach (ExerciseRoutineDto er in routine.ErDtos)
             {
-                exerciseRoutines.First(e => e.ExerciseId == er.ExerciseId).Sets = er.Sets;
+                for(int i = 0; i < er.Sets.Count; i++)
+                {
+                    sets.Add(new Set()
+                    {   
+                        Reps = er.Sets[i].Reps,
+                        Weight = er.Sets[i].Weight
+                    });
+                }
+                exerciseRoutines.First(e => e.ExerciseId == er.ExerciseId).Sets = sets;
             }
             EndpointsService.db.ExerciseRoutines.UpdateRange(exerciseRoutines);
             await EndpointsService.db.SaveChangesAsync();
@@ -70,24 +79,47 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
             var routine = await EndpointsService.db.Routines.FirstOrDefaultAsync(r => r.Id == id && r.User.Email == user.Email);
             if (routine is not null)
             {
-                var exercises = await EndpointsService.db.ExerciseRoutines.Where(er => er.RoutineId == routine.Id).Select(em => em.ExerciseId).ToListAsync();
-                var sets = await EndpointsService.db.ExerciseRoutines.Where(er => er.RoutineId == routine.Id).Select(er => er.Sets).ToListAsync();
+                var exercisesroutine = await EndpointsService.db.ExerciseRoutines.Include(er => er.Sets).Where(er => er.RoutineId == routine.Id).ToListAsync();
+                var exercisemuscles = await EndpointsService.db.ExerciseMuscles.Include(em => em.Exercise).Include(em => em.Muscle)
+                    .Where(e => (e.Exercise.User.Email.Equals(user.Email) || e.Exercise.User.Id.Equals(0)) && e.Type).ToListAsync();
                 
-                var dto = new List<ExerciseRoutineDto>();
-                for (int i = 0; i < exercises.Count; i++)
+                List<ExerciseRoutineDto> dto = new List<ExerciseRoutineDto>();
+                List<SetsDto> sets = new List<SetsDto>();
+                for (int i = 0; i < exercisesroutine.Count; i++)
                 {
+                    for (int s = 0; s < exercisesroutine[i].Sets.Count; s++)
+                    {
+                        sets.Add(new SetsDto()
+                        {
+                            Id = exercisesroutine[i].Sets[s].Id,
+                            Reps = exercisesroutine[i].Sets[s].Reps,
+                            Weight = exercisesroutine[i].Sets[s].Weight
+                            
+                        });
+                    }
                     dto.Add(new ExerciseRoutineDto()
                     {
-                        ExerciseId = exercises[i],
-                        Sets = sets[i]
+                        ExerciseId = exercisesroutine[i].ExerciseId,
+                        Sets = sets
+                    });
+                }
+
+                List<ExerciseMuscleDto> exercises = new List<ExerciseMuscleDto>();
+                for (int i = 0; i < exercisemuscles.Count; i++)
+                {
+                    exercises.Add(new ExerciseMuscleDto()
+                    {
+                        Id = exercisemuscles[i].Id,
+                        Name = exercisemuscles[i].Exercise.Name,
+                        Muscle = exercisemuscles[i].Muscle.Name
                     });
                 }
                 var result = new RoutineDto()
                 {
                     Name = routine.Name,
                     ErDtos = dto,
-                    Exercises = await EndpointsService.db.Exercises.Where(e=> e.User.Email.Equals(user.Email) || e.User.Id.Equals(0)).ToListAsync(),
-                    Muscles = await EndpointsService.db.Muscles.ToListAsync()
+                    Exercises = exercises,
+                    Muscles = await EndpointsService.db.Muscles.Select(m => m.Name).ToListAsync()
                 };
                 return TypedResults.Ok(result);
             }
@@ -111,13 +143,23 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                 check.Exercises = exercisesraw.Where(e => exerciseIds.Contains(e.Id)).ToList();
                 await EndpointsService.db.SaveChangesAsync();
                 var exerciseRoutines = await EndpointsService.db.ExerciseRoutines.Where(e => e.RoutineId == check.Id).ToListAsync();
+                List<Set> sets = new List<Set>();
                 foreach (ExerciseRoutineDto er in routine.ErDtos)
                 {
-                    exerciseRoutines.First(e => e.ExerciseId == er.ExerciseId).Sets = er.Sets;
+                    for (int i = 0; i < er.Sets.Count; i++)
+                    {
+                        sets.Add(new Set()
+                        {
+                            Reps = er.Sets[i].Reps,
+                            Weight = er.Sets[i].Weight
+                        });
+                    }
+
+                    exerciseRoutines.First(e => e.ExerciseId == er.ExerciseId).Sets = sets;
+                    EndpointsService.db.ExerciseRoutines.UpdateRange(exerciseRoutines);
+                    await EndpointsService.db.SaveChangesAsync();
+                    return Results.Ok();
                 }
-                EndpointsService.db.ExerciseRoutines.UpdateRange(exerciseRoutines);
-                await EndpointsService.db.SaveChangesAsync();
-                return Results.Ok();
             }
             return Results.Problem(statusCode: 404, extensions:
                 new Dictionary<string, object?>
