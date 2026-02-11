@@ -1,5 +1,6 @@
 ﻿using Azure;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MinhaPrimeiraAPI.Models
 {
@@ -13,7 +14,11 @@ namespace MinhaPrimeiraAPI.Models
         public List<Muscle> Muscles { get; set; } = [];
         public ICollection<ExerciseMuscle> ExerciseMuscles { get; set; } = [];
         public ICollection<Routine> Routines { get; set; } = [];
-        public ICollection<ExerciseRoutine> ExerciseRoutines { get; set; } = [];
+        [Required]
+        public int EquipmentId { get; set; }
+        [Required]
+        public Equipment Equipment { get; set; } = new Equipment();
+        public ICollection<ExerciseRoutine> ExerciseRoutines { get; set; } = null!;
         public int UserId { get; set; }
         public User User { get; set; } = null!;
     }
