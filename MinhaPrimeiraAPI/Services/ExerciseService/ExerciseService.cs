@@ -25,7 +25,7 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
                 });
             }
 
-            var result = new ExerciseDTO
+            var result = new ExerciseDto
             {
                 ExercisesMainMuscle = exerciseMainMuscle,
                 MuscleName = musclesTask.Select(m => m.Name).ToList(),
@@ -53,7 +53,7 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
                         }
                     };
                     
-                    var result = new ExerciseDTO()
+                    var result = new ExerciseDto()
                     {
                         ExercisesMainMuscle = exerciseMainMuscle,
                         MuscleName = exercisemuscle.Select(em => em.Muscle.Name).ToList()
@@ -74,7 +74,7 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
                 }
             );
         }
-        public static async Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt)
+        public static async Task<IResult> CreateExercise(ExerciseDto ex, ClaimsPrincipal jwt)
         {
             var mainMuscle = ex.ExercisesMainMuscle.First().MainMuscle;
             ex.MuscleName.Add(mainMuscle);

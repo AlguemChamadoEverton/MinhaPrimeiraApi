@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MinhaPrimeiraAPI.Services.ExerciseService
 {
-    public class ExerciseDTO
+    public class ExerciseDto
     {
         public List<string> MuscleName { get; set; } = new List<string>();
         [Required]

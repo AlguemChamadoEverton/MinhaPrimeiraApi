@@ -9,7 +9,7 @@ namespace MinhaPrimeiraAPI.Services.ExerciseService
         public static abstract Task<IResult> GetExercises(ClaimsPrincipal jwt);
         public static abstract Task<IResult> GetExerciseById(int id, ClaimsPrincipal jwt);
 
-        public static abstract Task<IResult> CreateExercise(ExerciseDTO ex, ClaimsPrincipal jwt);
+        public static abstract Task<IResult> CreateExercise(ExerciseDto ex, ClaimsPrincipal jwt);
 
         public static abstract Task<IResult> DeleteExerciseById(int id, ClaimsPrincipal jwt);
     }

@@ -55,7 +55,7 @@ namespace MinhaPrimeiraAPI.Endpoints
                 return ExerciseService.GetExerciseById(id, jwt);
             }).WithParameterValidation().RequireAuthorization();
 
-            app.MapPost("/exercise", (ExerciseDTO model, ClaimsPrincipal jwt) =>
+            app.MapPost("/exercise", (ExerciseDto model, ClaimsPrincipal jwt) =>
             {
                 return ExerciseService.CreateExercise(model, jwt);
             }).RequireAuthorization().WithParameterValidation();

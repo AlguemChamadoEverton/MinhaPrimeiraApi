@@ -25,7 +25,7 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
                     MainMuscle = exercise.Muscle.Name
                 });
             }
-            return TypedResults.Ok(new ExerciseDTO()
+            return TypedResults.Ok(new ExerciseDto()
             {
                 MuscleName = await EndpointsService.db.Muscles.Select(m => m.Name).ToListAsync(),
                 ExercisesMainMuscle = exerciseMainMuscle
