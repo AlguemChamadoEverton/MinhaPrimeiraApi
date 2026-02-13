@@ -14,7 +14,7 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
             var user = await EndpointsService.db.Users.FirstAsync(u => u.Email == email);
             var exercises = await EndpointsService.db.ExerciseMuscles.Include(em => em.Exercise).
                 Include(em => em.Muscle)
-                .Where(em => em.Type == true && (em.Exercise.User.Email.Equals(user.Email) || em.Exercise.User.Email.Equals("admin"))).ToListAsync();
+                .Where(em => em.Type == true && (em.Exercise.User.Email.Equals(user.Email) || !em.Exercise.IsCustom)).ToListAsync();
             var exerciseMainMuscle = new List<ExerciseMainMuscle>();
             
             foreach (ExerciseMuscle exercise in exercises)
