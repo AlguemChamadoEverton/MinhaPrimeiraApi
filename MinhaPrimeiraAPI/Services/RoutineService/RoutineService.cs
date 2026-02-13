@@ -68,8 +68,25 @@ namespace MinhaPrimeiraAPI.Services.RoutineService
         public static async Task<IResult> GetRoutine(ClaimsPrincipal jwt)
         {
             var email = jwt.FindFirst(ClaimTypes.Email)?.Value;
-            var routines = await EndpointsService.db.Routines.Where(r => r.User.Email == email).ToListAsync();
-            return TypedResults.Ok(routines);
+            var routines = await EndpointsService.db.Routines.Include(r => r.Exercises).Where(r => r.User.Email == email).ToListAsync();
+            var result = new List<RoutineDto>();
+            foreach (Routine routine in routines)
+            {
+                List<ExerciseMuscleDto> listEx = new List<ExerciseMuscleDto>();
+                foreach (Exercise ex in routine.Exercises)
+                {
+                    listEx.Add(new ExerciseMuscleDto()
+                    {
+                        Name = ex.Name
+                    });
+                }
+                result.Add(new RoutineDto()
+                {
+                    Name = routine.Name,
+                    Exercises = listEx
+                });
+            }
+            return TypedResults.Ok(result);
         }
 
         public static async Task<IResult> GetEditRoutine(ClaimsPrincipal jwt, int id)
